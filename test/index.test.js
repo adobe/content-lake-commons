@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Adobe. All rights reserved.
+ * Copyright 2023 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -13,11 +13,32 @@
 /* eslint-env mocha */
 
 import assert from 'assert';
-import { main } from '../src/index.js';
+import {
+  contextHelper,
+  QueueClient,
+  RestError,
+  Router,
+  SecretsManager,
+} from '../src/index.js';
 
 describe('Index Tests', () => {
-  it('index function is present', async () => {
-    const result = await main();
-    assert.strictEqual(result, 'Hello, world.');
+  it('export contextHelper is present', async () => {
+    assert.ok(contextHelper);
+  });
+
+  it('export QueueClient is present', async () => {
+    assert.ok(QueueClient);
+  });
+
+  it('export RestError is present', async () => {
+    assert.ok(RestError);
+  });
+
+  it('export Router is present', async () => {
+    assert.ok(Router);
+  });
+
+  it('export SecretsManager is present', async () => {
+    assert.ok(SecretsManager);
   });
 });
