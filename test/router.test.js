@@ -12,7 +12,7 @@
 /* eslint-disable no-await-in-loop */
 /* eslint-env mocha */
 import assert from 'assert';
-import { Request, Response } from '@adobe/fetch';
+import { Request, Response } from 'node-fetch';
 import { randomUUID } from 'crypto';
 import { Router } from '../src/router.js';
 

@@ -9,7 +9,7 @@
  * OF ANY KIND, either express or implied. See the License for the specific language
  * governing permissions and limitations under the License.
  */
-import { Response } from '@adobe/fetch';
+import { Response } from 'node-fetch';
 
 const STATUS_TITLES = {
   400: 'Bad Request',
