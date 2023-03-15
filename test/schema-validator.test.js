@@ -14,11 +14,26 @@
 import assert from 'assert';
 import { SchemaValidator } from '../src/schema-validator.js';
 
+const SMALL_REQ = {
+  data: {
+    sourceAssetId: '2D155092-F458-4DDC-A00C-3B003C55EF54',
+    sourceId: 'site.sharepoint.com:/sites/ASite',
+    sourceType: 'microsoft',
+    name: 'testFile.png',
+  },
+  binary: {
+    url: 'https://site.sharepoint.com/sites/ASite/_layouts/15/download.aspx?UniqueId=SOMEID\u0026Translate=false\u0026tempauth=SOMEJWT',
+  },
+  jobId: '123',
+  batchId: '2023-03-15T16:23:22.149Z',
+  requestId: '4556',
+};
+
 describe('Schema Validator Tests', () => {
   const validator = new SchemaValidator();
   describe('validateIngestionRequest', () => {
-    it('validates full object', () => {
-      validator.validateIngestionRequest({
+    it('validates full object', async () => {
+      await validator.validateIngestionRequest({
         data: {
           sourceAssetId: '2D155092-F458-4DDC-A00C-3B003C55EF54',
           sourceId: 'site.sharepoint.com:/sites/ASite',
@@ -42,39 +57,15 @@ describe('Schema Validator Tests', () => {
       });
     });
 
-    it('validates limited object', () => {
-      validator.validateIngestionRequest({
-        data: {
-          sourceAssetId: '2D155092-F458-4DDC-A00C-3B003C55EF54',
-          sourceId: 'site.sharepoint.com:/sites/ASite',
-          sourceType: 'microsoft',
-          name: 'testFile.png',
-        },
-        binary: {
-          url: 'https://site.sharepoint.com/sites/ASite/_layouts/15/download.aspx?UniqueId=SOMEID\u0026Translate=false\u0026tempauth=SOMEJWT',
-        },
-        jobId: '123',
-        batchId: '2023-03-15T16:23:22.149Z',
-        requestId: '4556',
-      });
+    it('validates limited object', async () => {
+      await validator.validateIngestionRequest(SMALL_REQ);
     });
 
-    it('fails on unexpected keys', () => {
+    it('fails on unexpected keys', async () => {
       let caught;
       try {
-        validator.validateIngestionRequest({
-          data: {
-            sourceAssetId: '2D155092-F458-4DDC-A00C-3B003C55EF54',
-            sourceId: 'site.sharepoint.com:/sites/ASite',
-            sourceType: 'microsoft',
-            name: 'testFile.png',
-          },
-          binary: {
-            url: 'https://site.sharepoint.com/sites/ASite/_layouts/15/download.aspx?UniqueId=SOMEID\u0026Translate=false\u0026tempauth=SOMEJWT',
-          },
-          jobId: '123',
-          batchId: '2023-03-15T16:23:22.149Z',
-          requestId: '4556',
+        await validator.validateIngestionRequest({
+          ...SMALL_REQ,
           iLikeNewKeys: true,
         });
       } catch (err) {
@@ -83,22 +74,23 @@ describe('Schema Validator Tests', () => {
       assert.ok(caught);
     });
 
-    it('fails on missing fields', () => {
+    it('fails on missing fields', async () => {
       let caught;
       try {
-        validator.validateIngestionRequest({
-          data: {
-            sourceAssetId: '2D155092-F458-4DDC-A00C-3B003C55EF54',
-            sourceId: 'site.sharepoint.com:/sites/ASite',
-            sourceType: 'microsoft',
-            name: 'testFile.png',
-          },
-          binary: {
-            url: 'https://site.sharepoint.com/sites/ASite/_layouts/15/download.aspx?UniqueId=SOMEID\u0026Translate=false\u0026tempauth=SOMEJWT',
-          },
-          jobId: '123',
-          batchId: '2023-03-15T16:23:22.149Z',
+        await validator.validateIngestionRequest({
+          ...SMALL_REQ,
+          requestId: undefined,
         });
+      } catch (err) {
+        caught = err;
+      }
+      assert.ok(caught);
+    });
+
+    it('can specify additional required fields', async () => {
+      let caught;
+      try {
+        await validator.validateIngestionRequest(SMALL_REQ, ['version']);
       } catch (err) {
         caught = err;
       }
