@@ -24,7 +24,7 @@ import { SecretsManager } from '../../src/secret.js';
 
 dotenv.config();
 
-const TIMEOUT_30_SEC = 30000;
+const SLOW_TEST_TIMEOUT = 5000;
 
 describe('Secrets Manager Integration Tests', async () => {
   const extractor = 'it';
@@ -61,7 +61,7 @@ describe('Secrets Manager Integration Tests', async () => {
     assert.strictEqual(value, 'value2');
 
     await mgr.deleteSecret(secretId);
-  }).timeout(TIMEOUT_30_SEC);
+  }).timeout(SLOW_TEST_TIMEOUT);
 
   after(async () => {
     const secretManager = new SecretsManagerClient(extractAwsConfig(process));
