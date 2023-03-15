@@ -24,6 +24,8 @@ import { SecretsManager } from '../../src/secret.js';
 
 dotenv.config();
 
+const TIMEOUT_30_SEC = 30000;
+
 describe('Secrets Manager Integration Tests', async () => {
   const extractor = 'it';
   it('fails on non-existing secret', async () => {
@@ -59,7 +61,7 @@ describe('Secrets Manager Integration Tests', async () => {
     assert.strictEqual(value, 'value2');
 
     await mgr.deleteSecret(secretId);
-  }).timeout(2000);
+  }).timeout(TIMEOUT_30_SEC);
 
   after(async () => {
     const secretManager = new SecretsManagerClient(extractAwsConfig(process));
@@ -74,15 +76,12 @@ describe('Secrets Manager Integration Tests', async () => {
         Promise.all(
           res.SecretList.filter(
             (secret) => secret.Name.startsWith('test') || secret.Name.startsWith('it'),
-          ).map((secret) => {
-            console.log('Removing secret', secret);
-            return secretManager.send(
-              new DeleteSecretCommand({
-                SecretId: secret.Name,
-              }),
-            );
-          }),
-        ).then(() => console.log('All test secrets removed'));
+          ).map((secret) => secretManager.send(
+            new DeleteSecretCommand({
+              SecretId: secret.Name,
+            }),
+          )),
+        );
       });
   });
 });
