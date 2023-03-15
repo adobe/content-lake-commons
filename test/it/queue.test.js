@@ -32,6 +32,8 @@ const DEFAULT_CONFIG = {
   queueUrl: process.env.QUEUE_URL,
 };
 
+const SLOW_TEST_TIMEOUT = 5000;
+
 describe('Queue Integration Tests', () => {
   it('will use default logger', async () => {
     const queueClient = new QueueClient({
@@ -78,7 +80,7 @@ describe('Queue Integration Tests', () => {
         caught = err;
       }
       assert.ok(caught);
-    });
+    }).timeout(SLOW_TEST_TIMEOUT);
 
     after(async () => {
       const queueClient = new QueueClient(DEFAULT_CONFIG);
