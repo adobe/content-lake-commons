@@ -3,7 +3,7 @@
   "type": "object",
   "default": {},
   "title": "Ingestion Request",
-  "required": ["data", "binary", "jobId", "batchId", "requestId"],
+  "required": ["data", "binary", "jobId", "batchId", "companyId", "spaceId"],
   "properties": {
     "data": {
       "type": "object",
@@ -21,11 +21,11 @@
         },
         "sourceType": {
           "type": "string",
-          "description": "The type of the source"
+          "description": "The type of the source, e.g. microsoft, dropbox, etc"
         },
         "sourceUrl": {
           "type": "string",
-          "default": "",
+          "format": "url",
           "description": "A URL for accessing this asset in the source system"
         },
         "name": {
@@ -66,6 +66,10 @@
       },
       "additionalProperties": false
     },
+    "sourceMetadata": {
+      "type": "object",
+      "description": "Additional metadata extracted from the source"
+    },
     "binary": {
       "type": "object",
       "default": {},
@@ -74,7 +78,8 @@
       "properties": {
         "url": {
           "type": "string",
-          "title": "A URL from which the binary can be retrieved"
+          "title": "A URL from which the binary can be retrieved",
+          "format": "url"
         },
         "headers": {
           "type": "object",
@@ -90,12 +95,19 @@
     },
     "batchId": {
       "type": "string",
-      "default": "",
       "description": "An identifier for the batch of assets within a job"
     },
     "requestId": {
       "type": "string",
       "description": "An identifier for a specific request, should be stable across retries of a request"
+    },
+    "companyId": {
+      "type": "string",
+      "description": "An identifier for the company to which the asset belongs in Content Lake"
+    },
+    "spaceId": {
+      "type": "string",
+      "description": "An identifier for the space to which the asset belongs in Content Lake"
     }
   },
   "additionalProperties": false

@@ -27,6 +27,8 @@ const SMALL_REQ = {
   jobId: '123',
   batchId: '2023-03-15T16:23:22.149Z',
   requestId: '4556',
+  companyId: 'test',
+  spaceId: 'test',
 };
 
 describe('Schema Validator Tests', () => {
@@ -48,12 +50,17 @@ describe('Schema Validator Tests', () => {
           lastModifiedBy: 'testuser2@adobe.com',
           path: '/sites/ASite/somepath/somefile.png',
         },
+        sourceMetadata: {
+          title: 'My Cool file title!',
+        },
         binary: {
           url: 'https://site.sharepoint.com/sites/ASite/_layouts/15/download.aspx?UniqueId=SOMEID\u0026Translate=false\u0026tempauth=SOMEJWT',
         },
         jobId: '123',
         batchId: '2023-03-15T16:23:22.149Z',
         requestId: '4556',
+        companyId: 'test',
+        spaceId: 'test',
       });
     });
 
@@ -79,7 +86,7 @@ describe('Schema Validator Tests', () => {
       try {
         await validator.validateIngestionRequest({
           ...SMALL_REQ,
-          requestId: undefined,
+          companyId: undefined,
         });
       } catch (err) {
         caught = err;
