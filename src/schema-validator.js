@@ -14,6 +14,12 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { readFile, readdir } from 'fs/promises';
 
+const SCHEMA_INGESTION_REQUEST = 'ingestion-request';
+
+/**
+ * Loads schemas from this project in the <code>schemas</code> directory and supports validating
+ * objects against the schemas.
+ */
 export class SchemaValidator {
   #loaded = false;
 
@@ -28,10 +34,10 @@ export class SchemaValidator {
       const schemas = await readdir(schemasDir);
       await Promise.all(
         schemas
-          .filter((f) => f.endsWith('.json'))
-          .map(async (fn) => {
-            const schemaName = fn.slice(0, -5);
-            const schemaBuf = await readFile(join(schemasDir, fn));
+          .filter((fileName) => fileName.endsWith('.json'))
+          .map(async (fileName) => {
+            const schemaName = fileName.slice(0, -5);
+            const schemaBuf = await readFile(join(schemasDir, fileName));
             this.#schemas[schemaName] = JSON.parse(schemaBuf.toString());
           }),
       );
@@ -41,12 +47,14 @@ export class SchemaValidator {
   }
 
   /**
-   *
+   * Validates the <code>ingestionRequest</code> object against the Ingestion Request schema
+   * as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
+   * @see https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract?
    * @param {any} ingestionRequest
    * @param {Array<string>} additionalRequiredData
    */
   async validateIngestionRequest(ingestionRequest, additionalRequiredData) {
-    const schema = await this.#getSchema('ingestion-request');
+    const schema = await this.#getSchema(SCHEMA_INGESTION_REQUEST);
     const result = validate(ingestionRequest, schema, {
       allowUnknownAttributes: false,
     });
@@ -59,7 +67,7 @@ export class SchemaValidator {
     }
     if (additionalRequiredData) {
       const missing = additionalRequiredData.filter(
-        (k) => !(k in ingestionRequest.data),
+        (key) => !(key in ingestionRequest.data),
       );
       if (missing.length > 0) {
         throw new Error(
