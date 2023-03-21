@@ -1,3 +1,17 @@
+## [1.0.2](https://github.com/adobe/content-lake-commons/compare/v1.0.1...v1.0.2) (2023-03-18)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([2d2d5b0](https://github.com/adobe/content-lake-commons/commit/2d2d5b05f43d224308d469b08490e44bea177793))
+
+## [1.0.1](https://github.com/adobe/content-lake-commons/compare/v1.0.0...v1.0.1) (2023-03-15)
+
+
+### Bug Fixes
+
+* fixing test failures due to timeouts and removing unnecessary console.log ([3676469](https://github.com/adobe/content-lake-commons/commit/36764696b5ebf24d5c8731f58576b6debffb04cb))
+
 # 1.0.0 (2023-03-15)
 
 
