@@ -19,6 +19,7 @@ import {
   QueueClient,
   RestError,
   Router,
+  SchemaValidator,
   SecretsManager,
 } from '../src/index.js';
 
@@ -41,6 +42,10 @@ describe('Index Tests', () => {
 
   it('export Router is present', async () => {
     assert.ok(Router);
+  });
+
+  it('export SchemaValidator is present', async () => {
+    assert.ok(SchemaValidator);
   });
 
   it('export SecretsManager is present', async () => {
