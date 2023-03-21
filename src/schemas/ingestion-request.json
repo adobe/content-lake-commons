@@ -9,7 +9,7 @@
       "type": "object",
       "default": {},
       "title": "Source Data",
-      "required": ["sourceAssetId", "sourceId", "sourceType", "name"],
+      "required": ["sourceAssetId", "sourceId", "sourceType", "name", "size"],
       "properties": {
         "sourceAssetId": {
           "type": "string",
@@ -34,7 +34,7 @@
         },
         "size": {
           "type": "integer",
-          "default": 0,
+          "default": -1,
           "description": "The size of the binary of the source asset"
         },
         "created": {

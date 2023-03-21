@@ -20,6 +20,7 @@ const SMALL_REQ = {
     sourceId: 'site.sharepoint.com:/sites/ASite',
     sourceType: 'microsoft',
     name: 'testFile.png',
+    size: -1,
   },
   binary: {
     url: 'https://site.sharepoint.com/sites/ASite/_layouts/15/download.aspx?UniqueId=SOMEID\u0026Translate=false\u0026tempauth=SOMEJWT',
