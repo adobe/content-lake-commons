@@ -27,6 +27,18 @@ describe('Context Tests', () => {
     });
   });
 
+  describe('getEnv', () => {
+    it('falls back to empty object', () => {
+      const helper = new ContextHelper({});
+      assert.ok(helper.getEnv());
+    });
+
+    it('returns env', () => {
+      const helper = new ContextHelper({ env: { test: 'is true' } });
+      assert.strictEqual(helper.getEnv().test, 'is true');
+    });
+  });
+
   describe('get original event', () => {
     it('will not fail if not present', () => {
       assert.ok(!contextHelper.extractOriginalEvent({}));

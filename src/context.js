@@ -60,7 +60,7 @@ export class ContextHelper {
    * @returns the configuration to use for providing credentials to AWS clients
    */
   extractAwsConfig() {
-    const { env } = this.#context;
+    const env = this.getEnv();
     const config = {
       credentials: {
         accessKeyId: env.AWS_ACCESS_KEY_ID,
@@ -88,6 +88,14 @@ export class ContextHelper {
    */
   extractSqsRecords() {
     return this.extractOriginalEvent()?.Records || [];
+  }
+
+  /**
+   * Get the environment variables
+   * @returns {Record<string,string|undefined>} the environment variables
+   */
+  getEnv() {
+    return this.#context.env || {};
   }
 
   /**
