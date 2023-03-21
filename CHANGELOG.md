@@ -1,3 +1,10 @@
+# [1.1.0](https://github.com/adobe/content-lake-commons/compare/v1.0.2...v1.1.0) (2023-03-21)
+
+
+### Features
+
+* adding schema validator for ingestion request ([ae1e423](https://github.com/adobe/content-lake-commons/commit/ae1e4237854355ecdc4f7da449b199039860e013))
+
 ## [1.0.2](https://github.com/adobe/content-lake-commons/compare/v1.0.1...v1.0.2) (2023-03-18)
 
 
