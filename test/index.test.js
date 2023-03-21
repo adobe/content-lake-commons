@@ -15,6 +15,7 @@
 import assert from 'assert';
 import {
   contextHelper,
+  ContextHelper,
   FetchRetry,
   QueueClient,
   RestError,
@@ -25,6 +26,10 @@ import {
 describe('Index Tests', () => {
   it('export contextHelper is present', async () => {
     assert.ok(contextHelper);
+  });
+
+  it('export ContextHelper is present', async () => {
+    assert.ok(ContextHelper);
   });
 
   it('export FetchRetry is present', async () => {

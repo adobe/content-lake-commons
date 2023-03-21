@@ -14,6 +14,7 @@
 
 import assert from 'assert';
 import { contextHelper } from '../src/index.js';
+import { ContextHelper } from '../src/context.js';
 
 describe('Context Tests', () => {
   describe('getLog', () => {
@@ -78,6 +79,62 @@ describe('Context Tests', () => {
       );
     });
   });
+
+  describe('isSqsRequest', () => {
+    it('will not fail if undefined', () => {
+      const helper = new ContextHelper({});
+      assert.ok(!helper.isSqsRequest());
+    });
+
+    it('will not fail if not present', () => {
+      const helper = new ContextHelper({
+        invocation: { event: {} },
+      });
+      assert.ok(!helper.isSqsRequest());
+    });
+
+    it('will return true on empty records array', () => {
+      const helper = new ContextHelper({
+        invocation: {
+          event: {
+            Records: [],
+          },
+        },
+      });
+      assert.ok(helper.isSqsRequest());
+    });
+
+    it('will extract records', () => {
+      const helper = new ContextHelper({
+        invocation: {
+          event: {
+            Records: [
+              {
+                messageId: 'af88e691-c3a6-4b46-b4d2-1c897b41b600',
+                receiptHandle:
+                  'AQEBJCLTpWgDm+oaeBAlSKWumzIoFRHeJglHCwWEfJANgc7GSWQBcYTiLPfbO1IuxAIkJagUIEkqgmszqnj2a7hLZjoIcv0AWCQfL0tmje/hhnDWYKdQmrUmfITdPDIg49XI+n+Ub/gKjXEy3VvunLsp0bxuF33OCsR8+N0Skff+U+zan+42GcHtn8lacm6ZQIF9msoFxszourA+zpJ/DJ1DTMlEpr9cSPxa6nsbg7JHOOwBzWknn7d3Zkimuo/J3shMyb+4fBYFRNpzXt9o9l8rfQpi9JZDwGIFRqDYFvpI0Emqv9ke1V2uBAJPiiGS0h1MIKO6dZZ/ejfWAR0Rug3zMEH9SEa6N+hT4gF5Pu2IN6WmcRhE4sh0jW/ImAAunuIo/OZ1FhNjqp+keK3AvBiPiQ==',
+                body: '{"message":"Hello World"}',
+                attributes: {
+                  ApproximateReceiveCount: '1',
+                  SentTimestamp: '1678764328689',
+                  SenderId: 'AIDAXXYBVS2FJDJXJ56HK',
+                  ApproximateFirstReceiveTimestamp: '1678764328690',
+                },
+                messageAttributes: {},
+                md5OfBody: 'd7e5fb40d1b43e304158449c3ecd6e5c',
+                eventSource: 'aws:sqs',
+                eventSourceARN:
+                  'arn:aws:sqs:us-east-1:532042585738:content-lake-it',
+                awsRegion: 'us-east-1',
+              },
+            ],
+          },
+        },
+      });
+      assert.ok(helper.isSqsRequest());
+    });
+  });
+
   describe('extractAwsConfig', () => {
     it('wont fail if not present', () => {
       assert.ok(contextHelper.extractAwsConfig({ env: {} }));
@@ -107,6 +164,60 @@ describe('Context Tests', () => {
       assert.strictEqual('key', creds.credentials.accessKeyId);
       assert.strictEqual('secret', creds.credentials.secretAccessKey);
       assert.strictEqual('session', creds.credentials.sessionToken);
+    });
+  });
+
+  describe('getFunctionIdentifier', () => {
+    it('can get function identifier', () => {
+      const helper = new ContextHelper({
+        func: {
+          name: 'test',
+          version: 1,
+        },
+      });
+      const identifer = helper.getFunctionIdentifier();
+      assert.strictEqual(identifer, 'test:1');
+    });
+    it('function identifer falls back to default', () => {
+      const helper = new ContextHelper({});
+      const identifer = helper.getFunctionIdentifier();
+      assert.strictEqual(identifer, 'unknown:1');
+    });
+  });
+
+  describe('getRequestId', () => {
+    it('can get request id', () => {
+      const helper = new ContextHelper({
+        invocation: {
+          requestId: 'test',
+        },
+      });
+      const id = helper.getRequestId();
+      assert.strictEqual(id, 'test');
+    });
+
+    it('request id defaults to random value', () => {
+      const helper = new ContextHelper({});
+      const id = helper.getRequestId();
+      assert.ok(id);
+    });
+  });
+
+  describe('getTransactionId', () => {
+    it('can get transaction id', () => {
+      const helper = new ContextHelper({
+        invocation: {
+          transactionId: 'test',
+        },
+      });
+      const id = helper.getTransactionId();
+      assert.strictEqual(id, 'test');
+    });
+
+    it('transactionId id defaults to random value', () => {
+      const helper = new ContextHelper();
+      const id = helper.getTransactionId();
+      assert.ok(id);
     });
   });
 });
