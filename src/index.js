@@ -11,6 +11,7 @@
  */
 
 export * as contextHelper from './context.js';
+export { ContextHelper } from './context.js';
 export * from './fetch-retry.js';
 export * from './queue.js';
 export * from './rest-error.js';
