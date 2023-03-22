@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/adobe/content-lake-commons/compare/v1.1.0...v1.2.0) (2023-03-22)
+
+
+### Features
+
+* Improving the Context Helper ([#9](https://github.com/adobe/content-lake-commons/issues/9)) ([4ca0b02](https://github.com/adobe/content-lake-commons/commit/4ca0b022900e939a8575a9afc3938efb361e8336))
+
 # [1.1.0](https://github.com/adobe/content-lake-commons/compare/v1.0.2...v1.1.0) (2023-03-21)
 
 
