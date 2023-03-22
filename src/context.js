@@ -28,7 +28,6 @@ import { randomUUID } from 'crypto';
  * @property {Record<string,any>} attributes
  * @property {Record<string,any>} messageAttributes
  * @property {string} eventSource
- * @property {string} eventSourceARN
  */
 
 /**
@@ -83,10 +82,10 @@ export class ContextHelper {
   }
 
   /**
-   * Gets the SQS records from the context
-   * @returns {Array<QueueRecord>} the SQS record payload
+   * Gets the queue records from the context
+   * @returns {Array<QueueRecord>} the queue records
    */
-  extractSqsRecords() {
+  extractQueueRecords() {
     return this.extractOriginalEvent()?.Records || [];
   }
 
@@ -130,10 +129,10 @@ export class ContextHelper {
   }
 
   /**
-   * Check whether or not this is a request from SQS
+   * Check whether or not this is a request contains Records from a queue
    * @returns {boolean}
    */
-  isSqsRequest() {
+  isQueueRequest() {
     return typeof this.extractOriginalEvent()?.Records !== 'undefined';
   }
 }
