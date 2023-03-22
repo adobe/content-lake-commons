@@ -92,17 +92,17 @@ describe('Context Tests', () => {
     });
   });
 
-  describe('isSqsRequest', () => {
+  describe('isQueueRequest', () => {
     it('will not fail if undefined', () => {
       const helper = new ContextHelper({});
-      assert.ok(!helper.isSqsRequest());
+      assert.ok(!helper.isQueueRequest());
     });
 
     it('will not fail if not present', () => {
       const helper = new ContextHelper({
         invocation: { event: {} },
       });
-      assert.ok(!helper.isSqsRequest());
+      assert.ok(!helper.isQueueRequest());
     });
 
     it('will return true on empty records array', () => {
@@ -113,7 +113,7 @@ describe('Context Tests', () => {
           },
         },
       });
-      assert.ok(helper.isSqsRequest());
+      assert.ok(helper.isQueueRequest());
     });
 
     it('will extract records', () => {
@@ -143,7 +143,13 @@ describe('Context Tests', () => {
           },
         },
       });
-      assert.ok(helper.isSqsRequest());
+      assert.ok(helper.isQueueRequest());
+      const records = helper.extractQueueRecords();
+      assert.ok(records[0]);
+      assert.strictEqual(
+        records[0].messageId,
+        'af88e691-c3a6-4b46-b4d2-1c897b41b600',
+      );
     });
   });
 

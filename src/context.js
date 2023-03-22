@@ -162,5 +162,5 @@ export function extractOriginalEvent(context) {
  * @deprecated
  */
 export function extractSqsRecords(context) {
-  return new ContextHelper(context).extractSqsRecords();
+  return new ContextHelper(context).extractQueueRecords();
 }
