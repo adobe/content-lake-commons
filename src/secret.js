@@ -30,7 +30,7 @@ export class SecretsManager {
    * @param {Object | undefined} config the configuration
    */
   constructor(namespace, config) {
-    this.#client = new SecretsManagerClient(config);
+    this.#client = config.client || new SecretsManagerClient(config);
     this.#namespace = namespace;
   }
 

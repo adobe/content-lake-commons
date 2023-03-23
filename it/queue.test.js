@@ -19,8 +19,8 @@ import {
   SendMessageCommand,
 } from '@aws-sdk/client-sqs';
 import util from 'util';
-import { QueueClient } from '../../src/queue.js';
-import { extractAwsConfig } from '../../src/context.js';
+import { QueueClient } from '../src/queue.js';
+import { extractAwsConfig } from '../src/context.js';
 
 dotenv.config();
 

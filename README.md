@@ -7,7 +7,6 @@
 [![CircleCI](https://img.shields.io/circleci/project/github/adobe/content-lake-commons.svg)](https://circleci.com/gh/adobe/content-lake-commons)
 [![GitHub license](https://img.shields.io/github/license/adobe/content-lake-commons.svg)](https://github.com/adobe/content-lake-commons/blob/master/LICENSE.txt)
 [![GitHub issues](https://img.shields.io/github/issues/adobe/content-lake-commons.svg)](https://github.com/adobe/content-lake-commons/issues)
-[![LGTM Code Quality Grade: JavaScript](https://img.shields.io/lgtm/grade/javascript/g/adobe/content-lake-commons.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/adobe/content-lake-commons)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg)](https://github.com/semantic-release/semantic-release)
 
 ## Installation
@@ -32,6 +31,20 @@ $ npm install
 
 ```bash
 $ npm test
+```
+### Integration Tests
+
+The Integration Tests require the following environment variables which can be supplied in a .env file:
+
+```
+AWS_ACCESS_KEY_ID=
+AWS_SECRET_ACCESS_KEY=
+AWS_REGION=
+QUEUE_URL=
+```
+
+```bash
+$ npm test:integration
 ```
 
 ### Lint

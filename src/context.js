@@ -15,9 +15,9 @@ import { randomUUID } from 'crypto';
 /**
  * @typedef {Object} UniversalishContext
  * @property {Record<string,string>} [env]
- * @property {{name?: string, version?:string}} [func]
+ * @property {{name:string,version:string}} [func]
  * @property {Logger} [log]
- * @property {{event?:any,transactionId?:string,requestId?:string}} [invocation]
+ * @property {{event:any,transactionId:string,requestId:string}} [invocation]
  */
 
 /**

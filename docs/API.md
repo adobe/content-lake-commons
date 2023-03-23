@@ -1,6 +1,9 @@
 ## Classes
 
 <dl>
+<dt><a href="#ContextHelper">ContextHelper</a></dt>
+<dd><p>A helper for working with the Franklin Universal context</p>
+</dd>
 <dt><a href="#FetchRetry">FetchRetry</a></dt>
 <dd><p>Support for retriable requests</p>
 </dd>
@@ -13,18 +16,14 @@ objects against the schemas.</p>
 ## Functions
 
 <dl>
-<dt><a href="#extractAwsConfig">extractAwsConfig(context)</a> ⇒</dt>
-<dd><p>Loads the configuration keys from an environment variable map</p>
-</dd>
-<dt><a href="#getLog">getLog(context)</a> ⇒ <code><a href="#Logger">Logger</a></code></dt>
-<dd><p>Get the logger from the context or return the console</p>
-</dd>
-<dt><a href="#extractOriginalEvent">extractOriginalEvent(context)</a> ⇒ <code>any</code></dt>
-<dd><p>Gets the original event that triggered the Lambda</p>
-</dd>
-<dt><a href="#extractSqsRecords">extractSqsRecords(context)</a> ⇒ <code><a href="#QueueRecord">Array.&lt;QueueRecord&gt;</a></code></dt>
-<dd><p>Gets the SQS records from the context</p>
-</dd>
+<dt><del><a href="#extractAwsConfig">extractAwsConfig()</a></del></dt>
+<dd></dd>
+<dt><del><a href="#getLog">getLog()</a></del></dt>
+<dd></dd>
+<dt><del><a href="#extractOriginalEvent">extractOriginalEvent()</a></del></dt>
+<dd></dd>
+<dt><del><a href="#extractSqsRecords">extractSqsRecords()</a></del></dt>
+<dd></dd>
 </dl>
 
 ## Typedefs
@@ -68,51 +67,28 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 
 <a name="extractAwsConfig"></a>
 
-## extractAwsConfig(context) ⇒
-Loads the configuration keys from an environment variable map
+## ~~extractAwsConfig()~~
+***Deprecated***
 
 **Kind**: global function  
-**Returns**: the configuration to use for providing credentials to AWS clients  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| context | [<code>UniversalishContext</code>](#UniversalishContext) | the context from which to retrieve      environment variables map |
-
 <a name="getLog"></a>
 
-## getLog(context) ⇒ [<code>Logger</code>](#Logger)
-Get the logger from the context or return the console
+## ~~getLog()~~
+***Deprecated***
 
 **Kind**: global function  
-
-| Param | Type |
-| --- | --- |
-| context | [<code>UniversalishContext</code>](#UniversalishContext) | 
-
 <a name="extractOriginalEvent"></a>
 
-## extractOriginalEvent(context) ⇒ <code>any</code>
-Gets the original event that triggered the Lambda
+## ~~extractOriginalEvent()~~
+***Deprecated***
 
 **Kind**: global function  
-**Returns**: <code>any</code> - the original invocation event for the Lambda  
-
-| Param | Type |
-| --- | --- |
-| context | [<code>UniversalishContext</code>](#UniversalishContext) | 
-
 <a name="extractSqsRecords"></a>
 
-## extractSqsRecords(context) ⇒ [<code>Array.&lt;QueueRecord&gt;</code>](#QueueRecord)
-Gets the SQS records from the context
+## ~~extractSqsRecords()~~
+***Deprecated***
 
 **Kind**: global function  
-**Returns**: [<code>Array.&lt;QueueRecord&gt;</code>](#QueueRecord) - the SQS record payload  
-
-| Param | Type |
-| --- | --- |
-| context | [<code>UniversalishContext</code>](#UniversalishContext) | 
-
 <a name="UniversalishContext"></a>
 
 ## UniversalishContext : <code>Object</code>
@@ -121,8 +97,9 @@ Gets the SQS records from the context
 
 | Name | Type |
 | --- | --- |
-| env | <code>Record.&lt;string, string&gt;</code> | 
-| log | [<code>Logger</code>](#Logger) | 
+| [env] | <code>Record.&lt;string, string&gt;</code> | 
+| [func] | <code>Object</code> | 
+| [log] | [<code>Logger</code>](#Logger) | 
 | [invocation] | <code>Object</code> | 
 
 <a name="QueueRecord"></a>
@@ -139,7 +116,6 @@ Gets the SQS records from the context
 | attributes | <code>Record.&lt;string, any&gt;</code> | 
 | messageAttributes | <code>Record.&lt;string, any&gt;</code> | 
 | eventSource | <code>string</code> | 
-| eventSourceARN | <code>string</code> | 
 
 <a name="Logger"></a>
 
