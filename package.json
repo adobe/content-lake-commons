@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "type": "module",
   "scripts": {
-    "test": "c8 mocha",
+    "test:integration": "mocha it/*.test.js",
+    "test": "c8 mocha test/*.test.js",
     "lint": "eslint .",
     "docs": "npx jsdoc2md -c .jsdoc.json --files 'src/*.js' > docs/API.md",
     "semantic-release": "semantic-release",

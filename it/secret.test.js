@@ -19,8 +19,8 @@ import {
   DeleteSecretCommand,
   ListSecretsCommand,
 } from '@aws-sdk/client-secrets-manager';
-import { extractAwsConfig } from '../../src/context.js';
-import { SecretsManager } from '../../src/secret.js';
+import { extractAwsConfig } from '../src/context.js';
+import { SecretsManager } from '../src/secret.js';
 
 dotenv.config();
 

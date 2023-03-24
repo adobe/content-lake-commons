@@ -38,6 +38,9 @@ jobs:
       - run:
           name: Getting Code Coverage
           command: npm run test
+      - run:
+          name: Running Integration Tests
+          command: npm run test:integration
       - codecov/upload
       - store_test_results:
           path: junit
