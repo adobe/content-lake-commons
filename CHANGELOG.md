@@ -1,3 +1,10 @@
+## [1.2.1](https://github.com/adobe/content-lake-commons/compare/v1.2.0...v1.2.1) (2023-03-24)
+
+
+### Bug Fixes
+
+* separating out the IT's and improving unit test coverage of secrets and queues ([#10](https://github.com/adobe/content-lake-commons/issues/10)) ([e7af759](https://github.com/adobe/content-lake-commons/commit/e7af759b053b168bfdfcbcc843c12f9246cbd23d))
+
 # [1.2.0](https://github.com/adobe/content-lake-commons/compare/v1.1.0...v1.2.0) (2023-03-22)
 
 
