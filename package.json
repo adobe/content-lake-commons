@@ -50,8 +50,10 @@
     "*.cjs": "eslint"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.299.0",
     "@aws-sdk/client-secrets-manager": "^3.290.0",
     "@aws-sdk/client-sqs": "^3.290.0",
+    "@aws-sdk/s3-request-presigner": "^3.299.0",
     "fetch-retry": "^5.0.4",
     "jsonschema": "^1.4.1",
     "node-fetch": "^3.3.1",

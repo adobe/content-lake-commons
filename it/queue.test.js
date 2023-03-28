@@ -21,6 +21,7 @@ import {
 import util from 'util';
 import { QueueClient } from '../src/queue.js';
 import { extractAwsConfig } from '../src/context.js';
+import { BlobStorage } from '../src/blob-storage.js';
 
 dotenv.config();
 
@@ -65,7 +66,7 @@ describe('Queue Integration Tests', () => {
       assert.ok(caught);
     });
 
-    it('will fail on oversized message', async () => {
+    it('will fail on oversized message with no blob storage', async () => {
       const queueClient = new QueueClient(DEFAULT_CONFIG);
       let caught;
       try {
@@ -80,6 +81,24 @@ describe('Queue Integration Tests', () => {
         caught = err;
       }
       assert.ok(caught);
+    }).timeout(SLOW_TEST_TIMEOUT);
+
+    it('can send oversized message with blob storage', async () => {
+      const queueClient = new QueueClient({
+        ...DEFAULT_CONFIG,
+        blobStorage: new BlobStorage({
+          ...DEFAULT_CONFIG,
+          bucket: 'cl-commons-it-files',
+        }),
+      });
+      const message = [];
+      for (let i = 0; i < 4086; i += 1) {
+        message.push(
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse nec nisl massa. Morbi at erat elementum, dignissim quam at.',
+        );
+      }
+      const messageId = await queueClient.sendMessage(message);
+      assert.ok(messageId);
     }).timeout(SLOW_TEST_TIMEOUT);
 
     after(async () => {
@@ -123,6 +142,22 @@ describe('Queue Integration Tests', () => {
       const { ReceiptHandle } = messages.Messages[0];
       assert.ok(ReceiptHandle);
       await queueClient.removeMessage(ReceiptHandle);
-    }).timeout(5000);
+    }).timeout(SLOW_TEST_TIMEOUT);
+  });
+
+  after(async () => {
+    const queueClient = new QueueClient(DEFAULT_CONFIG);
+    const messages = await queueClient.client.send(
+      new ReceiveMessageCommand({
+        QueueUrl: process.env.QUEUE_URL,
+      }),
+    );
+    Promise.all(
+      messages.Messages?.map(async (msg) => {
+        const { ReceiptHandle } = msg;
+        assert.ok(ReceiptHandle);
+        await queueClient.removeMessage(ReceiptHandle);
+      }),
+    );
   });
 });

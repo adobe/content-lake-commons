@@ -29,6 +29,8 @@ objects against the schemas.</p>
 ## Typedefs
 
 <dl>
+<dt><a href="#BlobStorageConfig">BlobStorageConfig</a></dt>
+<dd></dd>
 <dt><a href="#UniversalishContext">UniversalishContext</a> : <code>Object</code></dt>
 <dd></dd>
 <dt><a href="#QueueRecord">QueueRecord</a> : <code>Object</code></dt>
@@ -89,6 +91,20 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 ***Deprecated***
 
 **Kind**: global function  
+<a name="BlobStorageConfig"></a>
+
+## BlobStorageConfig
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| credentials | <code>Object</code> | 
+| credentials.accessKeyId | <code>string</code> | 
+| credentials.secretAccessKey | <code>string</code> | 
+| region | <code>string</code> | 
+| bucket | <code>string</code> | 
+
 <a name="UniversalishContext"></a>
 
 ## UniversalishContext : <code>Object</code>
@@ -150,6 +166,7 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 
 | Name | Type |
 | --- | --- |
+| [blobStorage] | <code>BlobStorage</code> | 
 | [client] | <code>SQSClient</code> | 
 | credentials | <code>Object</code> | 
 | credentials.accessKeyId | <code>string</code> | 

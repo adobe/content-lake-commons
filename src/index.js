@@ -10,6 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
+export * from './blob-storage.js';
 export * as contextHelper from './context.js'; // preserve backwards compatibility
 export { ContextHelper } from './context.js';
 export * from './fetch-retry.js';

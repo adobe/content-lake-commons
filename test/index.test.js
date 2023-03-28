@@ -14,6 +14,7 @@
 
 import assert from 'assert';
 import {
+  BlobStorage,
   contextHelper,
   ContextHelper,
   FetchRetry,
@@ -25,6 +26,10 @@ import {
 } from '../src/index.js';
 
 describe('Index Tests', () => {
+  it('export BlobStorage is present', async () => {
+    assert.ok(BlobStorage);
+  });
+
   it('export contextHelper is present', async () => {
     assert.ok(contextHelper);
   });

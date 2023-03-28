@@ -14,9 +14,13 @@ import {
   SQSClient,
   SendMessageCommand,
 } from '@aws-sdk/client-sqs';
+import { randomUUID } from 'crypto';
+// eslint-disable-next-line no-unused-vars
+import { BlobStorage } from './blob-storage.js';
 
 /**
  * @typedef QueueConfig
+ * @property {BlobStorage} [blobStorage]
  * @property {SQSClient} [client]
  * @property {Object} credentials
  * @property {string} credentials.accessKeyId
@@ -26,7 +30,14 @@ import {
  * @property {string} [region]
  */
 
+const MAX_MESSAGE_LEN = 127000; // 127 KB
+
 export class QueueClient {
+  /**
+   * @type {BlobStorage | undefined}
+   */
+  #blobStorage;
+
   /**
    * @type {SQSClient}
    */
@@ -44,20 +55,84 @@ export class QueueClient {
    */
   constructor(config) {
     this.#logger = config.logger || console;
-    this.#queueUrl = config.queueUrl;
     this.client = config.client || new SQSClient(config);
+    this.#blobStorage = config.blobStorage;
+    this.#queueUrl = config.queueUrl;
   }
 
+  /**
+   * Serializes the specified message to a string, saving to blob storage
+   * if the message exceeds the max size
+   * @param {Object} message the message to serialize
+   * @returns {Promise<string>} the message serialized as a string
+   */
+  async #serializeMessage(message) {
+    const json = JSON.stringify(message);
+    const size = Buffer.byteLength(json);
+    if (size < MAX_MESSAGE_LEN) {
+      this.#logger.debug('Message size is below max size, returning JSON', {
+        size,
+      });
+      return json;
+    } else if (this.#blobStorage) {
+      const key = randomUUID();
+      this.#logger.debug(
+        'Message size is above max size, saving to blob storage',
+        {
+          size,
+          key,
+        },
+      );
+      await this.#blobStorage.save(key, Buffer.from(json));
+      return JSON.stringify({ blobStorage: true, key });
+    } else {
+      this.#logger.error(
+        'Message size exceeds maximum and no blob storage provided',
+        { size },
+      );
+      throw new Error(
+        `Message size ${size} exceeds maximum and no blob storage provided`,
+      );
+    }
+  }
+
+  /**
+   * Reads the message, reading from blob storage if required
+   * @param {string} messageBody
+   * @returns {Promise<Object>}
+   */
+  async readMessageBody(messageBody) {
+    const json = JSON.parse(messageBody);
+    if (!json.blobStorage) {
+      this.#logger.debug('Message does not use blob storage');
+      return json;
+    } else if (this.#blobStorage) {
+      const { key } = json;
+      this.#logger.debug('Retrieving message from blob storage', { key });
+      return JSON.parse(await this.#blobStorage.getString(key));
+    } else {
+      throw new Error(
+        'Message stored in blob storage, but no blob storage client provided',
+      );
+    }
+  }
+
+  /**
+   * Sends the specified message to the queue
+   * @param {Object} message the message to send
+   * @returns {Promise<string>} the message id
+   */
   async sendMessage(message) {
     try {
       this.#logger.debug('Enqueing message', {
         message,
         queueUrl: this.#queueUrl,
       });
+      const messageBody = await this.#serializeMessage(message);
       const res = await this.client.send(
         new SendMessageCommand({
           QueueUrl: this.#queueUrl,
-          MessageBody: JSON.stringify(message),
+          MessageBody: messageBody,
         }),
       );
       const { MessageId } = res;
