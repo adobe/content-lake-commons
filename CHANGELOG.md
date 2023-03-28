@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/adobe/content-lake-commons/compare/v1.2.2...v1.3.0) (2023-03-28)
+
+
+### Features
+
+* adding blob storage support for queue messages ([#14](https://github.com/adobe/content-lake-commons/issues/14)) ([efafcc3](https://github.com/adobe/content-lake-commons/commit/efafcc3a39c02bd7b2f7d9d8f27430b27fc96f04))
+
 ## [1.2.2](https://github.com/adobe/content-lake-commons/compare/v1.2.1...v1.2.2) (2023-03-25)
 
 
