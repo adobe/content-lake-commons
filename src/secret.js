@@ -19,6 +19,13 @@ import {
   SecretsManagerClient,
 } from '@aws-sdk/client-secrets-manager';
 
+/**
+ * @typedef SecretConfigExt
+ * @property {SecretsManagerClient} [client]
+ *
+ * @typedef {import('./common-typedefs.js').AwsConfig & SecretConfigExt} SecretConfig
+ */
+
 export class SecretsManager {
   #client;
 
@@ -27,7 +34,7 @@ export class SecretsManager {
   /**
    * Creates a Configuration Manager
    * @param {string} namespace the namespace for the secret
-   * @param {Object | undefined} config the configuration
+   * @param {SecretConfig} config the configuration
    */
   constructor(namespace, config) {
     this.#client = config.client || new SecretsManagerClient(config);
@@ -46,6 +53,7 @@ export class SecretsManager {
   /**
    *
    * @param {string} id the id of the secret to create
+   * @param {string} secret the secret to save
    */
   async #upsertSecret(id, secret) {
     const SecretId = this.#makeKey(id);
@@ -98,7 +106,7 @@ export class SecretsManager {
   /**
    * Puts or creates the specified configuration
    * @param {string} id the id of the secret to persist
-   * @param {string} secret the se
+   * @param {string} secret the secret
    */
   async putSecret(id, secret) {
     await this.#upsertSecret(id, secret);

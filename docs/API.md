@@ -29,21 +29,27 @@ objects against the schemas.</p>
 ## Typedefs
 
 <dl>
-<dt><a href="#BlobStorageConfig">BlobStorageConfig</a></dt>
+<dt><a href="#BlobStorageConfig">BlobStorageConfig</a> : <code>Object</code></dt>
 <dd></dd>
-<dt><a href="#UniversalishContext">UniversalishContext</a> : <code>Object</code></dt>
+<dt><a href="#AwsCredentials">AwsCredentials</a> : <code>Object</code></dt>
 <dd></dd>
-<dt><a href="#QueueRecord">QueueRecord</a> : <code>Object</code></dt>
+<dt><a href="#AwsConfig">AwsConfig</a> : <code>Object</code></dt>
 <dd></dd>
 <dt><a href="#Logger">Logger</a> : <code>Object</code></dt>
 <dd></dd>
+<dt><a href="#UniversalishContext">UniversalishContext</a> : <code>Object</code></dt>
+<dd></dd>
 <dt><a href="#RetryConfig">RetryConfig</a></dt>
 <dd></dd>
-<dt><a href="#QueueConfig">QueueConfig</a></dt>
+<dt><a href="#QueueConfig">QueueConfig</a> : <code><a href="#AwsConfig">AwsConfig</a></code> | <code>QueueConfigExt</code></dt>
+<dd></dd>
+<dt><a href="#QueueRecord">QueueRecord</a> : <code>Object</code></dt>
 <dd></dd>
 <dt><a href="#Handler">Handler</a> ⇒ <code>Promise.&lt;Response&gt;</code></dt>
 <dd><p>Function for handling a routes inside Frankin / Content Lake services</p>
 </dd>
+<dt><a href="#SecretConfig">SecretConfig</a> : <code><a href="#AwsConfig">AwsConfig</a></code> | <code>SecretConfigExt</code></dt>
+<dd></dd>
 </dl>
 
 <a name="SchemaValidator"></a>
@@ -93,17 +99,50 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 **Kind**: global function  
 <a name="BlobStorageConfig"></a>
 
-## BlobStorageConfig
+## BlobStorageConfig : <code>Object</code>
 **Kind**: global typedef  
 **Properties**
 
 | Name | Type |
 | --- | --- |
-| credentials | <code>Object</code> | 
-| credentials.accessKeyId | <code>string</code> | 
-| credentials.secretAccessKey | <code>string</code> | 
-| region | <code>string</code> | 
 | bucket | <code>string</code> | 
+| [client] | <code>S3</code> | 
+
+<a name="AwsCredentials"></a>
+
+## AwsCredentials : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| accessKeyId | <code>string</code> | 
+| secretAccessKey | <code>string</code> | 
+| [sessionToken] | <code>string</code> | 
+
+<a name="AwsConfig"></a>
+
+## AwsConfig : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| credentials | [<code>AwsCredentials</code>](#AwsCredentials) | 
+| region | <code>string</code> | 
+
+<a name="Logger"></a>
+
+## Logger : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| debug | <code>function</code> | 
+| info | <code>function</code> | 
+| warn | <code>function</code> | 
+| error | <code>function</code> | 
 
 <a name="UniversalishContext"></a>
 
@@ -117,6 +156,31 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 | [func] | <code>Object</code> | 
 | [log] | [<code>Logger</code>](#Logger) | 
 | [invocation] | <code>Object</code> | 
+
+<a name="RetryConfig"></a>
+
+## RetryConfig
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| [retries] | <code>number</code> | 
+| [retryOn] | <code>Array.&lt;number&gt;</code> | 
+| [log] | <code>any</code> | 
+
+<a name="QueueConfig"></a>
+
+## QueueConfig : [<code>AwsConfig</code>](#AwsConfig) \| <code>QueueConfigExt</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| [blobStorage] | <code>BlobStorage</code> | 
+| [client] | <code>SQSClient</code> | 
+| [log] | [<code>Logger</code>](#Logger) | 
+| queueUrl | <code>string</code> | 
 
 <a name="QueueRecord"></a>
 
@@ -133,48 +197,6 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 | messageAttributes | <code>Record.&lt;string, any&gt;</code> | 
 | eventSource | <code>string</code> | 
 
-<a name="Logger"></a>
-
-## Logger : <code>Object</code>
-**Kind**: global typedef  
-**Properties**
-
-| Name | Type |
-| --- | --- |
-| debug | <code>function</code> | 
-| info | <code>function</code> | 
-| warn | <code>function</code> | 
-| error | <code>function</code> | 
-
-<a name="RetryConfig"></a>
-
-## RetryConfig
-**Kind**: global typedef  
-**Properties**
-
-| Name | Type |
-| --- | --- |
-| [retries] | <code>number</code> | 
-| [retryOn] | <code>Array.&lt;number&gt;</code> | 
-| [log] | <code>any</code> | 
-
-<a name="QueueConfig"></a>
-
-## QueueConfig
-**Kind**: global typedef  
-**Properties**
-
-| Name | Type |
-| --- | --- |
-| [blobStorage] | <code>BlobStorage</code> | 
-| [client] | <code>SQSClient</code> | 
-| credentials | <code>Object</code> | 
-| credentials.accessKeyId | <code>string</code> | 
-| credentials.secretAccessKey | <code>string</code> | 
-| [logger] | <code>\*</code> | 
-| queueUrl | <code>string</code> | 
-| [region] | <code>string</code> | 
-
 <a name="Handler"></a>
 
 ## Handler ⇒ <code>Promise.&lt;Response&gt;</code>
@@ -188,4 +210,14 @@ Function for handling a routes inside Frankin / Content Lake services
 | req | <code>Request</code> | the request |
 | context | <code>UniversalContext</code> | the context of the request |
 | params | <code>Record.&lt;string, string&gt;</code> | the parameters parsed from the request |
+
+<a name="SecretConfig"></a>
+
+## SecretConfig : [<code>AwsConfig</code>](#AwsConfig) \| <code>SecretConfigExt</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| [client] | <code>SecretsManagerClient</code> | 
 

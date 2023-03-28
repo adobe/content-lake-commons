@@ -12,16 +12,13 @@
 
 import { GetObjectCommand, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-// eslint-disable-next-line no-unused-vars
-import { Readable } from 'stream';
 
 /**
- * @typedef BlobStorageConfig
- * @property {Object} credentials
- * @property {string} credentials.accessKeyId
- * @property {string} credentials.secretAccessKey
- * @property {string} region
+ * @typedef {Object} BlobStorageConfigExt
  * @property {string} bucket
+ * @property {S3} [client]
+ *
+ * @typedef {import('./common-typedefs').AwsConfig & BlobStorageConfigExt} BlobStorageConfig
  */
 
 export class BlobStorage {
@@ -47,7 +44,7 @@ export class BlobStorage {
   /**
    * Return the binary for a blob
    * @param {string} key - identifier of the blob
-   * @returns {Promise<Readable>}
+   * @returns {Promise<import('stream').Readable>}
    */
   async get(key) {
     const res = await this.#s3client.send(
@@ -96,7 +93,7 @@ export class BlobStorage {
   /**
    * Saves the provided body to blob storage
    * @param {string} key
-   * @param {ReadableStream | Readable | Blob} body
+   * @param {ReadableStream | Buffer} body
    * @param {string} [mediaType]
    * @returns {Promise<void>}
    */

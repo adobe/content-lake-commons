@@ -15,26 +15,32 @@ import {
   SendMessageCommand,
 } from '@aws-sdk/client-sqs';
 import { randomUUID } from 'crypto';
-// eslint-disable-next-line no-unused-vars
-import { BlobStorage } from './blob-storage.js';
 
 /**
- * @typedef QueueConfig
- * @property {BlobStorage} [blobStorage]
+ * @typedef QueueConfigExt
+ * @property {import('./blob-storage.js').BlobStorage} [blobStorage]
  * @property {SQSClient} [client]
- * @property {Object} credentials
- * @property {string} credentials.accessKeyId
- * @property {string} credentials.secretAccessKey
- * @property {*} [logger]
+ * @property {import('./common-typedefs.js').Logger} [log]
  * @property {string} queueUrl
- * @property {string} [region]
+ *
+ * @typedef {import('./common-typedefs.js').AwsConfig & QueueConfigExt} QueueConfig
+ */
+
+/**
+ * @typedef {Object} QueueRecord
+ * @property {string} messageId
+ * @property {string} receiptHandle
+ * @property {string} body
+ * @property {Record<string,any>} attributes
+ * @property {Record<string,any>} messageAttributes
+ * @property {string} eventSource
  */
 
 const MAX_MESSAGE_LEN = 127000; // 127 KB
 
 export class QueueClient {
   /**
-   * @type {BlobStorage | undefined}
+   * @type {import('./blob-storage.js').BlobStorage | undefined}
    */
   #blobStorage;
 
@@ -54,7 +60,7 @@ export class QueueClient {
    * @param {QueueConfig} config
    */
   constructor(config) {
-    this.#logger = config.logger || console;
+    this.#logger = config.log || console;
     this.client = config.client || new SQSClient(config);
     this.#blobStorage = config.blobStorage;
     this.#queueUrl = config.queueUrl;
