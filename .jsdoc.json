@@ -1,17 +1,20 @@
 {
-  "plugins": [],
+  "plugins": [
+    "node_modules/jsdoc-tsimport-plugin/index.js",
+    "jsdoc-plugin-intersection"
+  ],
   "recurseDepth": 10,
   "source": {
-      "includePattern": ".+\\.js(doc|x)?$",
-      "excludePattern": "(^|\\/|\\\\)_"
+    "includePattern": ".+\\.js(doc|x)?$",
+    "excludePattern": "(^|\\/|\\\\)_"
   },
   "sourceType": "module",
   "tags": {
-      "allowUnknownTags": true,
-      "dictionaries": ["jsdoc","closure"]
+    "allowUnknownTags": true,
+    "dictionaries": ["jsdoc", "closure"]
   },
   "templates": {
-      "cleverLinks": false,
-      "monospaceLinks": false
+    "cleverLinks": false,
+    "monospaceLinks": false
   }
 }

@@ -16,26 +16,8 @@ import { randomUUID } from 'crypto';
  * @typedef {Object} UniversalishContext
  * @property {Record<string,string>} [env]
  * @property {{name:string,version:string}} [func]
- * @property {Logger} [log]
+ * @property {import('./common-typedefs.js').Logger} [log]
  * @property {{event:any,transactionId:string,requestId:string}} [invocation]
- */
-
-/**
- * @typedef {Object} QueueRecord
- * @property {string} messageId
- * @property {string} receiptHandle
- * @property {string} body
- * @property {Record<string,any>} attributes
- * @property {Record<string,any>} messageAttributes
- * @property {string} eventSource
- */
-
-/**
- * @typedef {Object} Logger
- * @property {function(...any[]):void} debug
- * @property {function(...any[]):void} info
- * @property {function(...any[]):void} warn
- * @property {function(...any[]):void} error
  */
 
 /**
@@ -56,7 +38,8 @@ export class ContextHelper {
 
   /**
    * Loads the configuration keys from an environment variable map
-   * @returns the configuration to use for providing credentials to AWS clients
+   * @returns {import('./common-typedefs.js').AwsConfig} sthe configuration to use for
+   *    providing credentials to AWS clients
    */
   extractAwsConfig() {
     const env = this.getEnv();
@@ -83,7 +66,7 @@ export class ContextHelper {
 
   /**
    * Gets the queue records from the context
-   * @returns {Array<QueueRecord>} the queue records
+   * @returns {Array<import('./queue.js').QueueRecord>} the queue records
    */
   extractQueueRecords() {
     return this.extractOriginalEvent()?.Records || [];
@@ -122,7 +105,7 @@ export class ContextHelper {
 
   /**
    * Get the logger from the context or return the console
-   * @returns {Logger}
+   * @returns {import('@adob')}
    */
   getLog() {
     return this.#context.log || console;
