@@ -1,5 +1,5 @@
 /*
- * Copyright 2022 Adobe. All rights reserved.
+ * Copyright 2023 Adobe. All rights reserved.
  * This file is licensed to you under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License. You may obtain a copy
  * of the License at http://www.apache.org/licenses/LICENSE-2.0
@@ -11,9 +11,9 @@
  */
 
 /* eslint-env mocha */
-import crypto from 'crypto';
+import { randomUUID} from 'crypto';
 import assert from 'assert';
-import util from 'util';
+import { promisify } from 'util';
 import { config } from 'dotenv';
 import { CloudSearchIndexStorage } from '../src/cloud-search-index-storage.js';
 
@@ -36,11 +36,11 @@ function randomString(length) {
 
 function generateContentRecord() {
   return {
-    jobId: crypto.randomUUID(),
+    jobId: randomUUID(),
     contentHash: randomString(32),
     thumbnailHash: randomString(32),
-    sourceId: crypto.randomUUID(),
-    sourceAssetId: crypto.randomUUID(),
+    sourceId: randomUUID(),
+    sourceAssetId: randomUUID(),
     sourceName: 'pickle.png',
     sourcePath: '/test/pickle.png',
     lastModified: new Date().toISOString(),
@@ -50,9 +50,9 @@ function generateContentRecord() {
     width: 200,
     height: 600,
     sourceType: 's3',
-    companyId: crypto.randomUUID(),
-    spaceId: crypto.randomUUID(),
-    assetIdentity: crypto.randomUUID(),
+    companyId: randomUUID(),
+    spaceId: randomUUID(),
+    assetIdentity: randomUUID(),
     tags: ['tag1', 'tag1'],
     caption: 'A really cool image of a pickle',
     color: 'silver',
@@ -61,7 +61,7 @@ function generateContentRecord() {
 }
 
 // TODO:  Fix this to do exponential backoff via recursive call
-const waitForRecord = util.promisify(setTimeout);
+const waitForRecord = promisify(setTimeout);
 
 describe('Cloud Search Index Storage integration tests', async () => {
   const context = {
@@ -70,8 +70,9 @@ describe('Cloud Search Index Storage integration tests', async () => {
       ALGOLIA_API_KEY: process.env.ALGOLIA_API_KEY,
       ALGOLIA_CI_INDEX: process.env.ALGOLIA_CI_INDEX,
     },
+    log: console,
   };
-  const searchIndexStorage = new CloudSearchIndexStorage(context).withLog(console);
+  const searchIndexStorage = new CloudSearchIndexStorage(context);
 
   it('Save a record in cloud search index storage and check it exists', async () => {
     let saveResult;
@@ -99,10 +100,10 @@ describe('Cloud Search Index Storage integration tests', async () => {
         ALGOLIA_APP_NAME: process.env.ALGOLIA_APP_NAME,
         ALGOLIA_API_KEY: process.env.ALGOLIA_API_KEY,
       },
+      log: console,
     };
     const companyId = 'it-testcompanyid';
-    const newSearchIndexStorage = new CloudSearchIndexStorage(newContext, companyId)
-      .withLog(console);
+    const newSearchIndexStorage = new CloudSearchIndexStorage(newContext, companyId);
     let saveResult;
     try {
       const contentRecord = generateContentRecord();
@@ -267,7 +268,64 @@ describe('Cloud Search Index Storage integration tests', async () => {
     }
   }).timeout(25000);
 
-  it('Delete all objects of a source type', async () => {
+  it('Delete all content records of a source type', async () => {
+    const sourceType = randomString(32);
+    try {
+      const contentRecord1 = {
+        contentHash: randomString(32),
+        sourceType,
+      };
+      const contentRecord2 = {
+        contentHash: randomString(32),
+        sourceType,
+      };
+      const saveResult1 = await searchIndexStorage.save(contentRecord1);
+      const saveResult2 = await searchIndexStorage.save(contentRecord2);
+      assert.notEqual(undefined, saveResult1);
+      assert.notEqual(undefined, saveResult2);
+
+      await waitForRecord(10000);
+
+      await searchIndexStorage.deleteBySourceType(sourceType);
+      await waitForRecord(10000);
+      let res = await searchIndexStorage.get(saveResult1.objectID);
+      assert.strictEqual(res.hits.length, 0);
+      res = await searchIndexStorage.get(saveResult2.objectID);
+      assert.strictEqual(res.hits.length, 0);
+    } finally {
+      await searchIndexStorage.deleteBySourceType(sourceType);
+    }
+  }).timeout(25000);
+
+  it('Delete content records by contentHash', async () => {
+    const contentHash = randomString(32);
+    try {
+      const contentRecord1 = {
+        contentHash,
+        sourceType: randomString(32),
+      };
+      const contentRecord2 = {
+        contentHash,
+        sourceType: randomString(32),
+      };
+      const saveResult1 = await searchIndexStorage.save(contentRecord1);
+      const saveResult2 = await searchIndexStorage.save(contentRecord2);
+      assert.notEqual(undefined, saveResult1);
+      assert.notEqual(undefined, saveResult2);
+
+      await waitForRecord(10000);
+
+      await searchIndexStorage.deleteByContentHash(contentHash);
+      await waitForRecord(10000);
+      let res = await searchIndexStorage.get(saveResult1.objectID);
+      assert.strictEqual(res.hits.length, 0);
+      res = await searchIndexStorage.get(saveResult2.objectID);
+      assert.strictEqual(res.hits.length, 0);
+    } finally {
+      await searchIndexStorage.deleteBySourceType(contentHash);
+    }
+  }).timeout(25000);
+  it('Delete content records by objectId', async () => {
     const sourceType = randomString(32);
     try {
       const contentRecord1 = {
