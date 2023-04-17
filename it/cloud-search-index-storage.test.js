@@ -184,7 +184,7 @@ describe('Cloud Search Index Storage integration tests', async () => {
       assert.ok(getResult);
       assert.strictEqual(getResult.length, 2);
     } finally {
-      await searchIndexStorage.deleteByContentHash(contentHash);
+      await searchIndexStorage.deleteBy('contentHash', contentHash);
     }
   }).timeout(20000);
 
@@ -217,7 +217,7 @@ describe('Cloud Search Index Storage integration tests', async () => {
         assert.strictEqual(getResult.hits[0].contentHash, contentHash);
       }
     } finally {
-      await searchIndexStorage.deleteByContentHash(contentHash);
+      await searchIndexStorage.deleteBy('contentHash', contentHash);
     }
   }).timeout(25000);
 
@@ -286,14 +286,14 @@ describe('Cloud Search Index Storage integration tests', async () => {
 
       await waitForRecord(10000);
 
-      await searchIndexStorage.deleteBySourceType(sourceType);
+      await searchIndexStorage.deleteBy('sourceType', sourceType);
       await waitForRecord(10000);
       let res = await searchIndexStorage.get(saveResult1.objectID);
       assert.strictEqual(res.hits.length, 0);
       res = await searchIndexStorage.get(saveResult2.objectID);
       assert.strictEqual(res.hits.length, 0);
     } finally {
-      await searchIndexStorage.deleteBySourceType(sourceType);
+      await searchIndexStorage.deleteBy('sourceType', sourceType);
     }
   }).timeout(25000);
 
@@ -315,42 +315,35 @@ describe('Cloud Search Index Storage integration tests', async () => {
 
       await waitForRecord(10000);
 
-      await searchIndexStorage.deleteByContentHash(contentHash);
+      await searchIndexStorage.deleteBy('contentHash', contentHash);
       await waitForRecord(10000);
       let res = await searchIndexStorage.get(saveResult1.objectID);
       assert.strictEqual(res.hits.length, 0);
       res = await searchIndexStorage.get(saveResult2.objectID);
       assert.strictEqual(res.hits.length, 0);
     } finally {
-      await searchIndexStorage.deleteBySourceType(contentHash);
+      await searchIndexStorage.deleteBy('contentHash', contentHash);
     }
   }).timeout(25000);
-  it('Delete content records by objectId', async () => {
-    const sourceType = randomString(32);
+  it('Delete content record by objectId', async () => {
+    let objectID;
     try {
-      const contentRecord1 = {
+      const contentRecord = {
         contentHash: randomString(32),
-        sourceType,
+        sourceType: randomString(32),
       };
-      const contentRecord2 = {
-        contentHash: randomString(32),
-        sourceType,
-      };
-      const saveResult1 = await searchIndexStorage.save(contentRecord1);
-      const saveResult2 = await searchIndexStorage.save(contentRecord2);
-      assert.notEqual(undefined, saveResult1);
-      assert.notEqual(undefined, saveResult2);
+      const saveResult = await searchIndexStorage.save(contentRecord);
+      assert.notEqual(undefined, saveResult);
+      objectID = saveResult.objectID;
 
       await waitForRecord(10000);
 
-      await searchIndexStorage.deleteBySourceType(sourceType);
+      await searchIndexStorage.delete(objectID);
       await waitForRecord(10000);
-      let res = await searchIndexStorage.get(saveResult1.objectID);
-      assert.strictEqual(res.hits.length, 0);
-      res = await searchIndexStorage.get(saveResult2.objectID);
+      const res = await searchIndexStorage.get(objectID);
       assert.strictEqual(res.hits.length, 0);
     } finally {
-      await searchIndexStorage.deleteBySourceType(sourceType);
+      await searchIndexStorage.delete(objectID);
     }
   }).timeout(25000);
 });

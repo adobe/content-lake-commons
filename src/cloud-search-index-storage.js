@@ -136,20 +136,20 @@ export class CloudSearchIndexStorage {
    * - Only update the values that are provided in the object (partial update)
    * - Only add fields that are able to be indexed: `this.#FIELDS_TO_INDEX`
    * @param {Object} doc document containing the contentHash and other fields to update
-   * @returns
    */
+  // eslint-disable-next-line consistent-return
   async updateByContentHash(doc) {
     if (!doc?.contentHash) {
-      this.#logger.info('Missing contentHash, no update in the record storage.');
-      return undefined;
+      const message = 'Missing contentHash, no update in the record storage.';
+      this.#logger.error(message);
+      throw new Error(message);
     }
     let objectIDs = await this.getObjectIdsByContentHash(doc.contentHash);
-    if (!objectIDs) {
-      this.#logger.info('No matching record found in the record storage.');
-      return undefined;
+    if (objectIDs.length > 0) {
+      objectIDs = objectIDs.map((objectID) => ({ objectID, ...doc }));
+      return this.update(objectIDs);
     }
-    objectIDs = objectIDs.map((objectID) => ({ objectID, ...doc }));
-    return this.update(objectIDs);
+    this.#logger.info('No matching record found in the record storage.');
   }
 
   /**
@@ -170,7 +170,8 @@ export class CloudSearchIndexStorage {
       }, {});
       return indexRecord;
     });
-    this.#logger.info(`Updating docs in cloud record storage index ${this.#indexName}`, indexRecords);
+    this.#logger.info(`Updating docs ${indexRecords.length} records in cloud record storage index ${this.#indexName}`);
+    this.#logger.debug('Documents updated:', indexRecords);
     return this.#index.partialUpdateObjects(indexRecords);
   }
 
@@ -184,25 +185,18 @@ export class CloudSearchIndexStorage {
   }
 
   /**
-   * Delete all records of a sourceType from index
-   * @param {String} sourceType source type of the record
+   * Delete all records of type `key` with value `value` from index
+   * `key` must be enabled as a filterable attribute in the index.
+   *
+   * Ex: `deleteBy('sourceType', 's3')` will delete all records with `sourceType` of `s3`
+   *
+   * @param {String} key attribute to delete by.
+   * @param {String} value value of the attribute to delete by.
    */
-  async deleteBySourceType(sourceType) {
-    this.#logger.info('Deleting all records of sourceType', sourceType);
+  async deleteBy(key, value) {
+    this.#logger.info(`Deleting all records with '${key}' containing value ${value}`);
     const params = {
-      filters: `sourceType:${sourceType}`,
-    };
-    await this.#index.deleteBy(params);
-  }
-
-  /**
-   * Delete all records containing containing the contentHash from index
-   * @param {String} contentHash sha256 hash of the source binary
-   */
-  async deleteByContentHash(contentHash) {
-    this.#logger.info('Deleting by contentHash', contentHash);
-    const params = {
-      filters: `contentHash:${contentHash}`,
+      filters: `${key}:${value}`,
     };
     await this.#index.deleteBy(params);
   }
