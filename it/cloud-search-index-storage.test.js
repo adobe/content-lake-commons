@@ -11,7 +11,7 @@
  */
 
 /* eslint-env mocha */
-import { randomUUID} from 'crypto';
+import { randomUUID } from 'crypto';
 import assert from 'assert';
 import { promisify } from 'util';
 import { config } from 'dotenv';
