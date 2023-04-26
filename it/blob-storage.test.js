@@ -16,13 +16,15 @@ import assert from 'assert';
 import { config } from 'dotenv';
 import https from 'https';
 import { BlobStorage } from '../src/blob-storage.js';
-import { extractAwsConfig } from '../src/context.js';
+import { ContextHelper } from '../src/context.js';
 
 config();
 
 const BUCKET = 'cl-commons-it-files';
 const TEST_BLOB_ID = 'test-blob.txt';
-const DEFAULT_CONFIG = { ...extractAwsConfig(process), bucket: BUCKET };
+const TEST_UPLOAD_BLOB_ID = 'test-upload-blob.webp';
+const DEFAULT_CONFIG = { ...(new ContextHelper(process).extractAwsConfig()), bucket: BUCKET };
+const SIGNED_URI_TTL = 60 * 15;
 
 describe('Cloud Blob Storage integration tests', () => {
   let s3;
@@ -101,7 +103,7 @@ describe('Cloud Blob Storage integration tests', () => {
     assert.strictEqual(body.trim(), 'Test Blob');
   });
 
-  it('Generate signed URI generates valid signed URI for correct blob', async () => {
+  it('Generate signed GET URI generates valid signed URI for correct blob', async () => {
     const blobStorage = new BlobStorage(DEFAULT_CONFIG);
     const uri = await blobStorage.getSignedURI(TEST_BLOB_ID);
     https
@@ -123,4 +125,25 @@ describe('Cloud Blob Storage integration tests', () => {
       blobStorage.getSignedURI('invalidKey');
     });
   });
+
+  it('Generate signed PUT URI generates a single valid signed URI for uploading', async () => {
+    const blobStorage = new BlobStorage(DEFAULT_CONFIG);
+    const uri = await blobStorage.generateUploadURIs(TEST_UPLOAD_BLOB_ID, 2048, SIGNED_URI_TTL);
+    assert.ok(uri);
+
+    // TODO: Actually test that the upload URI works
+  });
+
+  /*
+  TODO - Support multipart uploads.
+  it('Generate signed PUT URI generates multiple upload URIs for large size', async () => {
+    const blobStorage = new BlobStorage(DEFAULT_CONFIG);
+    const size = (256 * 1024 * 1024 * 3) + 10;
+    const uris = await blobStorage.generateUploadURIs(TEST_UPLOAD_BLOB_ID, size, SIGNED_URI_TTL);
+    assert.ok(uris);
+    assert.ok(Array.isArray(uris.urls));
+    assert.strictEqual(uris.urls.length, 4);
+    console.log(uris);
+  });
+  */
 });
