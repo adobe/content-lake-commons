@@ -1,3 +1,10 @@
+## [1.3.4](https://github.com/adobe/content-lake-commons/compare/v1.3.3...v1.3.4) (2023-04-29)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([a6a6835](https://github.com/adobe/content-lake-commons/commit/a6a683508c79d541f828dc5891ae8e3061748bca))
+
 ## [1.3.3](https://github.com/adobe/content-lake-commons/compare/v1.3.2...v1.3.3) (2023-04-22)
 
 
