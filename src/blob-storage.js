@@ -104,7 +104,10 @@ export class BlobStorage {
     throw new Error(`Generating upload URI for size > ${MAX_UPLOAD_BLOCK_SIZE} currently unsupported`);
 
     /*
-    TODO:  Support multipart uploads.
+    TODO:  Support multipart uploads.  NOTE:  This probably will not be needed until we start
+    supporting other thumbnail formats, like video (WEBP thumbnails will probably always be
+    under the single put upload size threshold).
+
     The AWS SDK doesn't seem to be including the part number and upload ID
     in the generated urls so we need to figure that out to make multipart
     work.
