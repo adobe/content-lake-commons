@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
-import { GetObjectCommand, PutObjectCommand, CreateMultipartUploadCommand, S3 } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand, DeleteObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 /**
@@ -170,6 +170,20 @@ export class BlobStorage {
         Key: key,
         Body: body,
         ContentType: mediaType,
+      }),
+    );
+  }
+
+  /**
+   * Deletes the object specified by the provided key
+   * @param {string} key
+   * @returns {Promise<void>}
+   */
+  async delete(key) {
+    return this.#s3client.send(
+      new DeleteObjectCommand({
+        Bucket: this.#bucket,
+        Key: key,
       }),
     );
   }

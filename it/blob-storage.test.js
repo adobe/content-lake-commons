@@ -15,6 +15,7 @@ import { S3 } from '@aws-sdk/client-s3';
 import assert from 'assert';
 import { config } from 'dotenv';
 import https from 'https';
+import crypto from 'crypto';
 import { BlobStorage } from '../src/blob-storage.js';
 import { ContextHelper } from '../src/context.js';
 
@@ -25,6 +26,48 @@ const TEST_BLOB_ID = 'test-blob.txt';
 const TEST_UPLOAD_BLOB_ID = 'test-upload-blob.webp';
 const DEFAULT_CONFIG = { ...(new ContextHelper(process).extractAwsConfig()), bucket: BUCKET };
 const SIGNED_URI_TTL = 60 * 15;
+
+/**
+ * Upload "size" bytes from the provided "buffer" to "uri".
+ *
+ * Useful for uploading to signed PUT uris.
+ *
+ * @param {string} uri
+ * @param {string} buffer
+ * @param {int} size
+ * @param {string} contentType
+ * @returns {Promise<string>} containing the HTTP response
+ */
+async function uploadBytes(uri, buffer, size, contentType = 'application/octet-stream') {
+  return new Promise((resolve, reject) => {
+    const uploadOptions = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': contentType,
+        'Content-Length': size,
+      },
+    };
+    const req = https.request(uri, uploadOptions, (res) => {
+      let response = '';
+      res.on('data', (chunk) => {
+        response += chunk;
+      });
+      res.on('end', () => {
+        resolve(response);
+      });
+      assert.strictEqual(
+        200,
+        res.statusCode,
+        `Expected 201 status but got ${res.statusCode}`,
+      );
+    }).on('error', (e) => {
+      reject(e);
+    });
+
+    req.write(buffer);
+    req.end();
+  });
+}
 
 describe('Cloud Blob Storage integration tests', () => {
   let s3;
@@ -131,8 +174,17 @@ describe('Cloud Blob Storage integration tests', () => {
     const uri = await blobStorage.generateUploadURIs(TEST_UPLOAD_BLOB_ID, 2048, SIGNED_URI_TTL);
     assert.ok(uri);
 
-    // TODO: Actually test that the upload URI works
-  });
+    const randomBytes = crypto.randomBytes(2048);
+
+    try {
+      await uploadBytes(uri, randomBytes, 2048, 'image/webp');
+
+      const blobBytes = await blobStorage.getString(TEST_UPLOAD_BLOB_ID);
+      assert.strictEqual(blobBytes, randomBytes.toString('utf-8'));
+    } finally {
+      await blobStorage.delete(TEST_UPLOAD_BLOB_ID);
+    }
+  }).timeout(5000);
 
   /*
   TODO - Support multipart uploads.
