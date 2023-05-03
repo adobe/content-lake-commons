@@ -26,9 +26,6 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
  * @typedef {import('./common-typedefs').AwsConfig & BlobStorageConfigExt} BlobStorageConfig
  */
 
-// TODO:  Uncomment when multipart upload is implmented
-// const MIN_UPLOAD_BLOCK_SIZE = 10 * 1024 * 1024; // 10MB
-const MAX_UPLOAD_BLOCK_SIZE = 256 * 1024 * 1024; // 256MB
 const DEFAULT_DOWNLOAD_URI_TTL = 3600; // 1 hr
 const DEFAULT_UPLOAD_URI_TTL = 900; // 15 min
 
@@ -89,7 +86,7 @@ export class BlobStorage {
 
   /**
    * Return a signed URI for writing a blob specified by 'key' that expires after the
-   * specified TTL; default is one hour.
+   * specified TTL; default is 15 minutes.
    * @param {string} key
    * @param {int} expirationInSeconds
    * @returns {Promise<string>}

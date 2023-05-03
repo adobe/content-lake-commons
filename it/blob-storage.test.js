@@ -15,7 +15,7 @@ import { S3 } from '@aws-sdk/client-s3';
 import assert from 'assert';
 import { config } from 'dotenv';
 import https from 'https';
-import { randomBytes} from 'crypto';
+import { randomBytes } from 'crypto';
 import { BlobStorage } from '../src/blob-storage.js';
 import { ContextHelper } from '../src/context.js';
 
