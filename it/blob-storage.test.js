@@ -15,7 +15,7 @@ import { S3 } from '@aws-sdk/client-s3';
 import assert from 'assert';
 import { config } from 'dotenv';
 import https from 'https';
-import crypto from 'crypto';
+import { randomBytes} from 'crypto';
 import { BlobStorage } from '../src/blob-storage.js';
 import { ContextHelper } from '../src/context.js';
 
@@ -171,31 +171,18 @@ describe('Cloud Blob Storage integration tests', () => {
 
   it('Generate signed PUT URI generates a single valid signed URI for uploading', async () => {
     const blobStorage = new BlobStorage(DEFAULT_CONFIG);
-    const uri = await blobStorage.generateUploadURIs(TEST_UPLOAD_BLOB_ID, 2048, SIGNED_URI_TTL);
+    const uri = await blobStorage.getSignedPutURI(TEST_UPLOAD_BLOB_ID, SIGNED_URI_TTL);
     assert.ok(uri);
 
-    const randomBytes = crypto.randomBytes(2048);
+    const srcBlob = randomBytes(2048);
 
     try {
-      await uploadBytes(uri, randomBytes, 2048, 'image/webp');
+      await uploadBytes(uri, srcBlob, 2048, 'image/webp');
 
-      const blobBytes = await blobStorage.getString(TEST_UPLOAD_BLOB_ID);
-      assert.strictEqual(blobBytes, randomBytes.toString('utf-8'));
+      const readBlob = await blobStorage.getString(TEST_UPLOAD_BLOB_ID);
+      assert.strictEqual(readBlob, srcBlob.toString('utf-8'));
     } finally {
       await blobStorage.delete(TEST_UPLOAD_BLOB_ID);
     }
   }).timeout(5000);
-
-  /*
-  TODO - Support multipart uploads.
-  it('Generate signed PUT URI generates multiple upload URIs for large size', async () => {
-    const blobStorage = new BlobStorage(DEFAULT_CONFIG);
-    const size = (256 * 1024 * 1024 * 3) + 10;
-    const uris = await blobStorage.generateUploadURIs(TEST_UPLOAD_BLOB_ID, size, SIGNED_URI_TTL);
-    assert.ok(uris);
-    assert.ok(Array.isArray(uris.urls));
-    assert.strictEqual(uris.urls.length, 4);
-    console.log(uris);
-  });
-  */
 });

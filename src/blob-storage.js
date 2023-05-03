@@ -68,8 +68,10 @@ export class BlobStorage {
   }
 
   /**
-   * Return a signed URI for the blob specified by 'key' that expires in one hour.
+   * Return a signed URI for reading the blob specified by 'key' that expires after the
+   * specified TTL; default is one hour.
    * @param {string} key - identifier of the blob
+   * @param {int} expirationInSeconds
    * @returns {Promise<string>}
    */
   async getSignedURI(key, expirationInSeconds = DEFAULT_DOWNLOAD_URI_TTL) {
@@ -85,7 +87,14 @@ export class BlobStorage {
     );
   }
 
-  async #createSignedPutURI(key, expiresIn, signableHeaders) {
+  /**
+   * Return a signed URI for writing a blob specified by 'key' that expires after the
+   * specified TTL; default is one hour.
+   * @param {string} key
+   * @param {int} expirationInSeconds
+   * @returns {Promise<string>}
+   */
+  async getSignedPutURI(key, expirationInSeconds = DEFAULT_UPLOAD_URI_TTL) {
     return getSignedUrl(
       this.#s3client,
       new PutObjectCommand({
@@ -93,56 +102,9 @@ export class BlobStorage {
         Key: key,
       }),
       {
-        expiresIn,
-        signableHeaders,
+        expirationInSeconds,
       },
     );
-  }
-
-  async generateUploadURIs(key, size, expirationInSeconds = DEFAULT_UPLOAD_URI_TTL) {
-    // Figure out how many urls
-    const numUris = Math.ceil(size / MAX_UPLOAD_BLOCK_SIZE);
-    if (numUris === 1) {
-      // this is pretty easy
-      return this.#createSignedPutURI(key, expirationInSeconds);
-    }
-    throw new Error(`Generating upload URI for size > ${MAX_UPLOAD_BLOCK_SIZE} currently unsupported`);
-
-    /*
-    TODO:  Support multipart uploads.  NOTE:  This probably will not be needed until we start
-    supporting other thumbnail formats, like video (WEBP thumbnails will probably always be
-    under the single put upload size threshold).
-
-    The AWS SDK doesn't seem to be including the part number and upload ID
-    in the generated urls so we need to figure that out to make multipart
-    work.
-
-    const multipartUploadResponse = await this.#s3client.send(
-      new CreateMultipartUploadCommand({
-        Bucket: this.#bucket,
-        Key: key,
-      }),
-    );
-    const uploadId = multipartUploadResponse.UploadId;
-    const uploadUris = [];
-
-    for (let partNumber = 1; partNumber <= numUris; partNumber += 1) {
-      uploadUris.push(
-        // eslint-disable-next-line no-await-in-loop
-        await this.#createSignedPutURI(
-          key,
-          expirationInSeconds,
-          new Set([`x-amz-part-number: ${partNumber}`, `x-amz-upload-id: ${uploadId}`]),
-        ),
-      );
-    }
-
-    return {
-      urls: uploadUris,
-      minPartSize: MIN_UPLOAD_BLOCK_SIZE,
-      maxPartSize: MAX_UPLOAD_BLOCK_SIZE,
-    };
-    */
   }
 
   /**
