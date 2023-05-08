@@ -27,7 +27,7 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
  */
 
 const DEFAULT_DOWNLOAD_URI_TTL = 3600; // 1 hr
-const DEFAULT_UPLOAD_URI_TTL = 900; // 15 min
+const DEFAULT_UPLOAD_URI_TTL = 3600; // 1 hr
 
 export class BlobStorage {
   /**
@@ -67,7 +67,7 @@ export class BlobStorage {
   /**
    * Return a signed URI for reading the blob specified by 'key' that expires after the
    * specified TTL; default is one hour.
-   * @param {string} key - identifier of the blob
+   * @param {string} key - identifier of the blob.
    * @param {int} expirationInSeconds
    * @returns {Promise<string>}
    */
@@ -86,8 +86,8 @@ export class BlobStorage {
 
   /**
    * Return a signed URI for writing a blob specified by 'key' that expires after the
-   * specified TTL; default is 15 minutes.
-   * @param {string} key
+   * specified TTL; default is one hour.
+   * @param {string} key - identifier of the blob.
    * @param {int} expirationInSeconds
    * @returns {Promise<string>}
    */
