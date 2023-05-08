@@ -10,7 +10,12 @@
  * governing permissions and limitations under the License.
  */
 
-import { GetObjectCommand, PutObjectCommand, S3 } from '@aws-sdk/client-s3';
+import {
+  GetObjectCommand,
+  PutObjectCommand,
+  DeleteObjectCommand,
+  S3,
+} from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
 /**
@@ -20,6 +25,9 @@ import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
  *
  * @typedef {import('./common-typedefs').AwsConfig & BlobStorageConfigExt} BlobStorageConfig
  */
+
+const DEFAULT_DOWNLOAD_URI_TTL = 3600; // 1 hr
+const DEFAULT_UPLOAD_URI_TTL = 3600; // 1 hr
 
 export class BlobStorage {
   /**
@@ -57,11 +65,13 @@ export class BlobStorage {
   }
 
   /**
-   * Return a signed URI for the blob specified by 'key' that expires in one hour.
-   * @param {string} key - identifier of the blob
+   * Return a signed URI for reading the blob specified by 'key' that expires after the
+   * specified TTL; default is one hour.
+   * @param {string} key - identifier of the blob.
+   * @param {int} expirationInSeconds
    * @returns {Promise<string>}
    */
-  async getSignedURI(key) {
+  async getSignedURI(key, expirationInSeconds = DEFAULT_DOWNLOAD_URI_TTL) {
     return getSignedUrl(
       this.#s3client,
       new GetObjectCommand({
@@ -69,7 +79,27 @@ export class BlobStorage {
         Key: key,
       }),
       {
-        expiresIn: 3600,
+        expiresIn: expirationInSeconds,
+      },
+    );
+  }
+
+  /**
+   * Return a signed URI for writing a blob specified by 'key' that expires after the
+   * specified TTL; default is one hour.
+   * @param {string} key - identifier of the blob.
+   * @param {int} expirationInSeconds
+   * @returns {Promise<string>}
+   */
+  async getSignedPutURI(key, expirationInSeconds = DEFAULT_UPLOAD_URI_TTL) {
+    return getSignedUrl(
+      this.#s3client,
+      new PutObjectCommand({
+        Bucket: this.#bucket,
+        Key: key,
+      }),
+      {
+        expirationInSeconds,
       },
     );
   }
@@ -104,6 +134,20 @@ export class BlobStorage {
         Key: key,
         Body: body,
         ContentType: mediaType,
+      }),
+    );
+  }
+
+  /**
+   * Deletes the object specified by the provided key
+   * @param {string} key
+   * @returns {Promise<void>}
+   */
+  async delete(key) {
+    return this.#s3client.send(
+      new DeleteObjectCommand({
+        Bucket: this.#bucket,
+        Key: key,
       }),
     );
   }
