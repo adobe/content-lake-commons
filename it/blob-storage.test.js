@@ -15,14 +15,59 @@ import { S3 } from '@aws-sdk/client-s3';
 import assert from 'assert';
 import { config } from 'dotenv';
 import https from 'https';
+import { randomBytes } from 'crypto';
 import { BlobStorage } from '../src/blob-storage.js';
-import { extractAwsConfig } from '../src/context.js';
+import { ContextHelper } from '../src/context.js';
 
 config();
 
 const BUCKET = 'cl-commons-it-files';
 const TEST_BLOB_ID = 'test-blob.txt';
-const DEFAULT_CONFIG = { ...extractAwsConfig(process), bucket: BUCKET };
+const TEST_UPLOAD_BLOB_ID = 'test-upload-blob.webp';
+const DEFAULT_CONFIG = { ...(new ContextHelper(process).extractAwsConfig()), bucket: BUCKET };
+const SIGNED_URI_TTL = 60 * 15;
+
+/**
+ * Upload "size" bytes from the provided "buffer" to "uri".
+ *
+ * Useful for uploading to signed PUT uris.
+ *
+ * @param {string} uri
+ * @param {string} buffer
+ * @param {int} size
+ * @param {string} contentType
+ * @returns {Promise<string>} containing the HTTP response
+ */
+async function uploadBytes(uri, buffer, size, contentType = 'application/octet-stream') {
+  return new Promise((resolve, reject) => {
+    const uploadOptions = {
+      method: 'PUT',
+      headers: {
+        'Content-Type': contentType,
+        'Content-Length': size,
+      },
+    };
+    const req = https.request(uri, uploadOptions, (res) => {
+      let response = '';
+      res.on('data', (chunk) => {
+        response += chunk;
+      });
+      res.on('end', () => {
+        resolve(response);
+      });
+      assert.strictEqual(
+        200,
+        res.statusCode,
+        `Expected 201 status but got ${res.statusCode}`,
+      );
+    }).on('error', (e) => {
+      reject(e);
+    });
+
+    req.write(buffer);
+    req.end();
+  });
+}
 
 describe('Cloud Blob Storage integration tests', () => {
   let s3;
@@ -101,7 +146,7 @@ describe('Cloud Blob Storage integration tests', () => {
     assert.strictEqual(body.trim(), 'Test Blob');
   });
 
-  it('Generate signed URI generates valid signed URI for correct blob', async () => {
+  it('Generate signed GET URI generates valid signed URI for correct blob', async () => {
     const blobStorage = new BlobStorage(DEFAULT_CONFIG);
     const uri = await blobStorage.getSignedURI(TEST_BLOB_ID);
     https
@@ -123,4 +168,21 @@ describe('Cloud Blob Storage integration tests', () => {
       blobStorage.getSignedURI('invalidKey');
     });
   });
+
+  it('Generate signed PUT URI generates a single valid signed URI for uploading', async () => {
+    const blobStorage = new BlobStorage(DEFAULT_CONFIG);
+    const uri = await blobStorage.getSignedPutURI(TEST_UPLOAD_BLOB_ID, SIGNED_URI_TTL);
+    assert.ok(uri);
+
+    const srcBlob = randomBytes(2048);
+
+    try {
+      await uploadBytes(uri, srcBlob, 2048, 'image/webp');
+
+      const readBlob = await blobStorage.getString(TEST_UPLOAD_BLOB_ID);
+      assert.strictEqual(readBlob, srcBlob.toString('utf-8'));
+    } finally {
+      await blobStorage.delete(TEST_UPLOAD_BLOB_ID);
+    }
+  }).timeout(5000);
 });
