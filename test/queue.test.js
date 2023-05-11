@@ -18,7 +18,7 @@ import { MockAwsClient } from './mocks/aws-client.js';
 
 const LARGE_MESSAGE = {
   // generates a 128KB string by joining the alphabet 5120 times
-  msg: [...Array(5120)].map(() => 'abcdefghiklmnopqrstuvwxyz').join(''),
+  msg: [...Array(5120)].map(() => 'abcdefghijklmnopqrstuvwxyz').join(''),
 };
 
 describe('QueueClient Unit Tests', () => {
