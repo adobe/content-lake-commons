@@ -42,12 +42,25 @@ export class MockAlgoliaSearch {
 
   async saveObject(object) {
     console.log('Mocked Save object called with object', object);
-    this.storage[object.contentHash] = object;
+    this.storage[object.objectID] = object;
     return object;
   }
 
   async partialUpdateObjects(objects) {
     console.log('Partial update objects called with objects', objects);
+    // no need to implement this logic for now. Just make sure this method was called
     return objects;
+  }
+
+  async deleteObject(objectId) {
+    console.log('Mocked Delete object called with objectId', objectId);
+    delete this.storage[objectId];
+    return objectId;
+  }
+
+  async deleteBy(params) {
+    console.log('Mocked Delete by called with params', params);
+    // no need to implement this logic for now. Just make sure this method was called
+    return params;
   }
 }

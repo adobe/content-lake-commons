@@ -206,6 +206,6 @@ export class CloudSearchIndexStorage {
     const params = {
       filters: `${key}:${value}`,
     };
-    await this.#index.deleteBy(params);
+    return this.#index.deleteBy(params);
   }
 }

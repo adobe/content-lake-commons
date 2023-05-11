@@ -73,7 +73,16 @@ function mockContext() {
   };
 }
 
+let searchIndexStorage;
+
 describe('Cloud Search Index Storage tests', async () => {
+  before(() => {
+    stub(CloudSearchIndexStorage.prototype, 'getClient').returns(new MockAlgoliaSearch());
+    searchIndexStorage = new CloudSearchIndexStorage(mockContext());
+  });
+  after(() => {
+    CloudSearchIndexStorage.prototype.getClient.restore();
+  });
   it('Use comapny name as the index name: `company-*`', async () => {
     const context = {
       env: {
@@ -82,13 +91,21 @@ describe('Cloud Search Index Storage tests', async () => {
       },
       log: console,
     };
-    const searchIndexStorage = new CloudSearchIndexStorage(context, 'test-company-id');
-    assert.strictEqual(searchIndexStorage.getIndexName(), 'company-test-company-id');
+    const searchIndexStorage2 = new CloudSearchIndexStorage(context, 'test-company-id');
+    assert.strictEqual(searchIndexStorage2.getIndexName(), 'company-test-company-id');
   });
 
+  it('check if item exists requires a contentHash', async () => {
+    const contentRecord = generateContentRecord();
+    const saveResult = await searchIndexStorage.save(contentRecord);
+    assert.notEqual(undefined, saveResult);
+
+    const exists = await searchIndexStorage.exists({
+      sourceAssetId: contentRecord.sourceAssetId,
+    });
+    assert.ok(!exists);
+  });
   it('Save a record in cloud search index storage and check it exists', async () => {
-    stub(CloudSearchIndexStorage.prototype, 'getClient').returns(new MockAlgoliaSearch());
-    const searchIndexStorage = new CloudSearchIndexStorage(mockContext());
     const contentRecord = generateContentRecord();
     const saveResult = await searchIndexStorage.save(contentRecord);
     assert.notEqual(undefined, saveResult);
@@ -118,29 +135,106 @@ describe('Cloud Search Index Storage tests', async () => {
     assert.strictEqual(exists[0].sourceUrl, contentRecord.sourceUrl);
     assert.ok(exists[0].objectID);
     assert.ok(!exists[0].randomField);
-    CloudSearchIndexStorage.prototype.getClient.restore();
+  });
+  it('Save a record in cloud search index storage and get the object', async () => {
+    const contentRecord = generateContentRecord();
+    const saveResult = await searchIndexStorage.save(contentRecord);
+    assert.notEqual(undefined, saveResult);
+
+    const { hits } = await searchIndexStorage.get(saveResult.objectID);
+    assert.strictEqual(hits.length, 1);
+    assert.strictEqual(hits[0].contentHash, contentRecord.contentHash);
+    assert.strictEqual(hits[0].thumbnailHash, contentRecord.thumbnailHash);
+    assert.strictEqual(hits[0].sourceId, contentRecord.sourceId);
+    assert.strictEqual(hits[0].sourceAssetId, contentRecord.sourceAssetId);
+    assert.strictEqual(hits[0].sourceName, contentRecord.sourceName);
+    assert.strictEqual(hits[0].sourcePath, contentRecord.sourcePath);
+    assert.strictEqual(hits[0].file, contentRecord.file);
+    assert.strictEqual(hits[0].type, contentRecord.type);
+    assert.strictEqual(hits[0].width, contentRecord.width);
+    assert.strictEqual(hits[0].height, contentRecord.height);
+    assert.strictEqual(hits[0].sourceType, contentRecord.sourceType);
+    assert.strictEqual(hits[0].companyId, contentRecord.companyId);
+    assert.strictEqual(hits[0].spaceId, contentRecord.spaceId);
+    assert.strictEqual(hits[0].assetIdentity, contentRecord.assetIdentity);
+    assert.deepStrictEqual(hits[0].tags, contentRecord.tags);
+    assert.strictEqual(hits[0].caption, contentRecord.caption);
+    assert.strictEqual(hits[0].color, contentRecord.color);
+    assert.strictEqual(hits[0].sourceUrl, contentRecord.sourceUrl);
+    assert.strictEqual(hits[0].objectID, saveResult.objectID);
+    assert.ok(!hits[0].randomField);
   });
 
   it('Get all objectIDs by contentHash', async () => {
+    const contentRecord = generateContentRecord();
+    const saveResult = await searchIndexStorage.save(contentRecord);
+    assert.notEqual(undefined, saveResult);
+
+    const objectIds = await searchIndexStorage.getObjectIdsByContentHash(contentRecord.contentHash);
+    assert.strictEqual(objectIds.length, 1);
+    assert.strictEqual(objectIds[0], saveResult.objectID);
   });
-  it('Throw an exception getting all objectIDs by an invalid contentHash', async () => {
+  it('Should not get results getting all objectIDs by an invalid contentHash', async () => {
+    const objectIds = await searchIndexStorage.getObjectIdsByContentHash('invalid');
+    assert.strictEqual(objectIds.length, 0);
   });
 
   it('Update all content records that contain a contentHash', async () => {
-  });
+    const contentRecord = generateContentRecord();
+    const saveResult = await searchIndexStorage.save(contentRecord);
+    assert.notEqual(undefined, saveResult);
 
-  it('Update a content record', async () => {
+    const updateResult = await searchIndexStorage.updateByContentHash({
+      sourceId: 'random',
+      contentHash: contentRecord.contentHash,
+    });
+    // mocked response from mocked algolia client
+    assert.strictEqual(updateResult.length, 1);
+    assert.strictEqual(updateResult[0].sourceId, 'random');
   });
-
-  it('Only update a content record with allowed fields', async () => {
+  it('Cannot update all content records that contain a contentHash without a contentHash', async () => {
+    try {
+      await searchIndexStorage.updateByContentHash({
+        sourceId: 'random',
+      });
+      assert.fail('Should have failed');
+    } catch (error) {
+      assert.strictEqual(error.message, 'Missing contentHash, no update in the record storage.');
+    }
   });
-
-  it('Delete all content records of a source type', async () => {
-  });
-
-  it('Through exception deleting all content records of a field that doesn\'t exist', async () => {
+  it('Cannot update all content records that contain a contentHash without a contentHash that exists.', async () => {
+    const res = await searchIndexStorage.updateByContentHash({
+      sourceId: 'random',
+      contentHash: 'invalid',
+    });
+    assert.ok(!res);
   });
 
   it('Delete content records by objectId', async () => {
+    const contentRecord = generateContentRecord();
+    const saveResult = await searchIndexStorage.save(contentRecord);
+    assert.notEqual(undefined, saveResult);
+
+    const exists = await searchIndexStorage.exists({
+      contentHash: contentRecord.contentHash,
+      sourceAssetId: contentRecord.sourceAssetId,
+    });
+    assert.strictEqual(exists.length, 1);
+
+    await searchIndexStorage.delete(saveResult.objectID);
+    const existsNow = await searchIndexStorage.exists({
+      contentHash: contentRecord.contentHash,
+      sourceAssetId: contentRecord.sourceAssetId,
+    });
+    assert.ok(!existsNow);
+  });
+
+  it('delete all content hashes', async () => {
+    const contentRecord = generateContentRecord();
+    const saveResult = await searchIndexStorage.save(contentRecord);
+    assert.notEqual(undefined, saveResult);
+
+    const deleteByParams = await searchIndexStorage.deleteBy('contentHash', contentRecord.contentHash);
+    assert.deepStrictEqual(deleteByParams, { filters: `contentHash:${contentRecord.contentHash}` });
   });
 });
