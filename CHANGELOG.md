@@ -1,3 +1,15 @@
+# [1.4.0](https://github.com/adobe/content-lake-commons/compare/v1.3.4...v1.4.0) (2023-05-10)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([8429451](https://github.com/adobe/content-lake-commons/commit/8429451d7056db04d51a93c1dcea346512984779))
+
+
+### Features
+
+* Generate put urls ([#21](https://github.com/adobe/content-lake-commons/issues/21)) ([64c7c1f](https://github.com/adobe/content-lake-commons/commit/64c7c1f2668388f9bbba2b900b467971941c43c4))
+
 ## [1.3.4](https://github.com/adobe/content-lake-commons/compare/v1.3.3...v1.3.4) (2023-04-29)
 
 
