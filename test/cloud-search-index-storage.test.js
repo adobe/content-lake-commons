@@ -74,16 +74,21 @@ function mockContext() {
 }
 
 let searchIndexStorage;
-
 describe('Cloud Search Index Storage tests', async () => {
   before(() => {
     stub(CloudSearchIndexStorage.prototype, 'getClient').returns(new MockAlgoliaSearch());
     searchIndexStorage = new CloudSearchIndexStorage(mockContext());
   });
   after(() => {
-    CloudSearchIndexStorage.prototype.getClient.restore();
+    try {
+      CloudSearchIndexStorage.prototype.getClient.restore();
+    } catch (error) {
+      // ignore
+    }
   });
-  it('Use comapny name as the index name: `company-*`', async () => {
+  it('Use company name as the index name: `company-*`', async () => {
+    // don't use mocked client for this test
+    CloudSearchIndexStorage.prototype.getClient.restore();
     const context = {
       env: {
         ALGOLIA_APP_NAME: 'appname',
