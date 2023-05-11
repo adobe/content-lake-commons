@@ -28,10 +28,18 @@ export class CloudSearchIndexStorage {
     this.#logger = new ContextHelper(context).getLog();
     this.#logger.info('Using Search Index', this.#indexName);
 
-    this.#index = algoliasearch(
+    this.#index = this.getClient(context).initIndex(this.#indexName);
+  }
+
+  getIndexName() {
+    return this.#indexName;
+  }
+
+  getClient(context) {
+    return algoliasearch(
       context.env.ALGOLIA_APP_NAME,
       context.env.ALGOLIA_API_KEY,
-    ).initIndex(this.#indexName);
+    );
   }
 
   /**
