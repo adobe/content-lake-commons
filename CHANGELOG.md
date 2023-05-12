@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/adobe/content-lake-commons/compare/v1.4.0...v1.5.0) (2023-05-12)
+
+
+### Features
+
+* move search index storage class to commons ([#17](https://github.com/adobe/content-lake-commons/issues/17)) ([f04f985](https://github.com/adobe/content-lake-commons/commit/f04f98545aa56e90920571cdd1ec51b854c35f6e))
+
 # [1.4.0](https://github.com/adobe/content-lake-commons/compare/v1.3.4...v1.4.0) (2023-05-10)
 
 
