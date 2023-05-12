@@ -45,7 +45,8 @@
     "mocha": "10.2.0",
     "mocha-multi-reporters": "1.5.1",
     "nock": "^13.3.0",
-    "semantic-release": "21.0.2"
+    "semantic-release": "21.0.2",
+    "sinon": "^15.0.4"
   },
   "lint-staged": {
     "*.js": "eslint",
@@ -56,6 +57,8 @@
     "@aws-sdk/client-secrets-manager": "^3.290.0",
     "@aws-sdk/client-sqs": "^3.290.0",
     "@aws-sdk/s3-request-presigner": "^3.299.0",
+    "algoliasearch": "^4.17.0",
+    "clone": "^2.1.2",
     "fetch-retry": "^5.0.4",
     "jsonschema": "^1.4.1",
     "node-fetch": "^3.3.1",
