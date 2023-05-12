@@ -120,7 +120,7 @@ export class CloudSearchIndexStorage {
   /**
    * Get a list of ObjectID that contain the contentHash
    * @param {String} contentHash sha256 hash of the source binary
-   * @returns list of strings of ojectIDs
+   * @returns {Promise<Array<string>>} list of objectIDs
    */
   async getObjectIdsByContentHash(contentHash) {
     const searchResult = await this.#index.search(
