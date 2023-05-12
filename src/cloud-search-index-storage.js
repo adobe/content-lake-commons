@@ -19,14 +19,14 @@ import { ContextHelper } from './context.js';
 export class CloudSearchIndexStorage {
   #FIELDS_TO_INDEX = new Set(['objectID', 'assetIdentity', 'contentHash', 'sourceName', 'sourceType', 'thumbnailHash', 'file', 'companyId', 'spaceId', 'type', 'tags', 'ocrTags', 'caption', 'width', 'height', 'color', 'sourceId', 'sourceUrl', 'sourceAssetId', 'sourcePath']);
   #INDEX_PREFIX = 'company';
-  #logger;
+  #log;
   #index;
   #indexName;
 
   constructor(context, companyId) {
     this.#indexName = context.env.ALGOLIA_CI_INDEX || `${this.#INDEX_PREFIX}-${companyId}`;
-    this.#logger = new ContextHelper(context).getLog();
-    this.#logger.info('Using Search Index', this.#indexName);
+    this.#log = new ContextHelper(context).getLog();
+    this.#log.info('Using Search Index', this.#indexName);
 
     this.#index = this.getClient(context).initIndex(this.#indexName);
   }
@@ -54,7 +54,7 @@ export class CloudSearchIndexStorage {
     // if no contentHash, we don't want to match just on the sourceId
     // because that is not reliable so we will not return a match
     if (!query || !query.contentHash) {
-      this.#logger.info('Missing query.contentHash, no existence in the record storage.');
+      this.#log.info('Missing query.contentHash, no existence in the record storage.');
       return false;
     }
 
@@ -111,9 +111,10 @@ export class CloudSearchIndexStorage {
     }, {});
     if (!indexRecord?.objectID) {
       indexRecord.objectID = crypto.randomUUID();
+      this.#log.warn(`Missing objectID, generating a new one: ${indexRecord.objectID}`);
     }
 
-    this.#logger.info(`Saving doc to cloud record storage index ${this.#indexName}`, indexRecord);
+    this.#log.info(`Saving doc to cloud record storage index ${this.#indexName}`, indexRecord);
     return this.#index.saveObject(indexRecord);
   }
 
@@ -149,7 +150,7 @@ export class CloudSearchIndexStorage {
   async updateByContentHash(doc) {
     if (!doc?.contentHash) {
       const message = 'Missing contentHash, no update in the record storage.';
-      this.#logger.error(message);
+      this.#log.error(message);
       throw new Error(message);
     }
     let objectIDs = await this.getObjectIdsByContentHash(doc.contentHash);
@@ -157,7 +158,10 @@ export class CloudSearchIndexStorage {
       objectIDs = objectIDs.map((objectID) => ({ objectID, ...doc }));
       return this.update(objectIDs);
     }
-    this.#logger.info('No matching record found in the record storage.');
+    this.#log.info('No matching record found in the record storage.');
+    // return empty object in this case to mtach the return type of update()
+    // https://www.algolia.com/doc/api-reference/api-methods/partial-update-objects/#response
+    return {};
   }
 
   /**
@@ -165,7 +169,7 @@ export class CloudSearchIndexStorage {
    * Only update the values that are provided in the object (partial update):
    * https://www.algolia.com/doc/api-reference/api-methods/partial-update-objects/
    * @param {Array<Object>} records Array of content records with fields to update
-   * @returns
+   * @returns {Promise<Object>} Algolia response including objectIDs of updated records and a taskID
    */
   async update(records) {
     const indexRecords = records.map((doc) => {
@@ -178,8 +182,8 @@ export class CloudSearchIndexStorage {
       }, {});
       return indexRecord;
     });
-    this.#logger.info(`Updating docs ${indexRecords.length} records in cloud record storage index ${this.#indexName}`);
-    this.#logger.debug('Documents updated:', indexRecords);
+    this.#log.info(`Updating docs ${indexRecords.length} records in cloud record storage index ${this.#indexName}`);
+    this.#log.debug('Documents updated:', indexRecords);
     return this.#index.partialUpdateObjects(indexRecords);
   }
 
@@ -202,7 +206,7 @@ export class CloudSearchIndexStorage {
    * @param {String} value value of the attribute to delete by.
    */
   async deleteBy(key, value) {
-    this.#logger.info(`Deleting all records with '${key}' containing value ${value}`);
+    this.#log.info(`Deleting all records with '${key}' containing value ${value}`);
     const params = {
       filters: `${key}:${value}`,
     };

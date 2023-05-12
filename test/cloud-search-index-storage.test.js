@@ -13,12 +13,9 @@
 /* eslint-env mocha */
 import { randomUUID } from 'crypto';
 import assert from 'assert';
-import { config } from 'dotenv';
 import { stub } from 'sinon';
 import { MockAlgoliaSearch } from './mocks/mock-algoliasearch.js';
 import { CloudSearchIndexStorage } from '../src/cloud-search-index-storage.js';
-
-config();
 
 /**
  * Generates a non-cryptographically-secure string of random alphanumeric characters of
@@ -212,7 +209,7 @@ describe('Cloud Search Index Storage tests', async () => {
       sourceId: 'random',
       contentHash: 'invalid',
     });
-    assert.ok(!res);
+    assert.deepStrictEqual(res, {});
   });
 
   it('Delete content records by objectId', async () => {
