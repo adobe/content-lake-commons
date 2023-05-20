@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/adobe/content-lake-commons/compare/v1.5.0...v1.5.1) (2023-05-20)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([2d9a4e9](https://github.com/adobe/content-lake-commons/commit/2d9a4e976eaed28f8442d3ca5879b58a05649f47))
+
 # [1.5.0](https://github.com/adobe/content-lake-commons/compare/v1.4.0...v1.5.0) (2023-05-12)
 
 
