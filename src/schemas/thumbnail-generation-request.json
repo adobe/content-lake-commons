@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2019-09/schema",
+  "type": "object",
+  "default": {},
+  "title": "Thumbnail Generation Request",
+  "required": ["data", "binary", "params", "jobId", "batchId", "requestId", "companyId", "spaceId"],
+  "properties": {
+    "data": {
+      "type": "object",
+      "default": {},
+      "title": "Source Data",
+      "required": ["sourceAssetId", "sourceId", "sourceType", "sourceName", "sourceSize", "sourceMimeType", "sourceSha256"],
+      "properties": {
+        "sourceAssetId": {
+          "type": "string",
+          "description": "The unique identifier for the asset in the Source system"
+        },
+        "sourceId": {
+          "type": "string",
+          "description": "The identifier for the instance of the source"
+        },
+        "sourceType": {
+          "type": "string",
+          "description": "The type of the source, e.g. microsoft, dropbox, etc"
+        },
+        "sourceUrl": {
+          "type": "string",
+          "format": "url",
+          "description": "A URL for accessing this asset in the source system"
+        },
+        "sourceName": {
+          "type": "string",
+          "description": "The name of the asset in the source"
+        },
+        "sourceSize": {
+          "type": "integer",
+          "default": -1,
+          "description": "The size of the binary of the source asset"
+        },
+        "sourceMimeType": {
+          "type": "string",
+          "default": "application/octet-stream",
+          "description": "MIME type of the source asset"
+        },
+        "sourceSha256": {
+          "type": "string",
+          "description": "Computed SHA-256 hash of the source asset"
+        },
+        "hash": {
+          "type": "string",
+          "description": "A hash value of the source asset as determined by the extraction source"
+        },
+        "created": {
+          "type": "string",
+          "description": "The date on which the asset was created in the source system",
+          "format": "date-time"
+        },
+        "createdBy": {
+          "type": "string",
+          "description": "An identifier for the principal which created the asset in the source system"
+        },
+        "lastModified": {
+          "type": "string",
+          "description": "The date on which the asset was last modified in the source",
+          "format": "date-time"
+        },
+        "lastModifiedBy": {
+          "type": "string",
+          "description": "An ID for the principal whom last updated the asset in the source system"
+        },
+        "path": {
+          "type": "string",
+          "description": "The path to the asset in the source system"
+        },
+        "version": {
+          "description": "The version of the current asset in the source system",
+          "type": "string"
+        },
+        "sourceWidth": {
+          "type": "integer",
+          "default": -1,
+          "description": "Width of the source asset"
+        },
+        "sourceHeight": {
+          "type": "integer",
+          "default": -1,
+          "description": "Height of the source asset"
+        },
+        "extractedSourceMetadata": {
+          "type": "object",
+          "default": {},
+          "description": "Metadata extracted from the source asset"
+        }
+      },
+      "additionalProperties": false
+    },
+    "sourceMetadata": {
+      "type": "object",
+      "description": "Additional metadata extracted from the source"
+    },
+    "binary": {
+      "type": "object",
+      "default": {},
+      "title": "Binary Request",
+      "required": ["url"],
+      "properties": {
+        "url": {
+          "type": "string",
+          "title": "A URL from which the binary can be retrieved",
+          "format": "url"
+        },
+        "headers": {
+          "type": "object",
+          "description": "Headers required to be passed along with the request to the URL",
+          "additionalProperties": { "type": "string" }
+        }
+      },
+      "additionalProperties": false
+    },
+    "params": {
+      "type": "object",
+      "default": {},
+      "title": "Parameters for next action",
+      "required": ["uploadUrls", "sourceMimeType", "thumbnailKey"],
+      "properties": {
+        "uploadUrls": {
+          "oneOf": [
+            { "type": "string", "format": "url"},
+            {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "url"
+              }
+            }
+          ],
+          "description": "One or more URLs that can be used to upload the generated thumbnail"
+        },
+        "sourceMimeType": {
+          "type": "string",
+          "default": "application/octet-stream",
+          "description": "MIME type of the source asset"
+        },
+        "thumbnailKey": {
+          "type": "string",
+          "description": "Temporary name of the thumbnail to use"
+        }
+      },
+      "additionalProperties": false
+    },
+    "jobId": {
+      "type": "string",
+      "description": "An identifier for an execution of extracting assets from a source"
+    },
+    "batchId": {
+      "type": "string",
+      "description": "An identifier for the batch of assets within a job"
+    },
+    "requestId": {
+      "type": "string",
+      "description": "An identifier for a specific request, should be stable across retries of a request"
+    },
+    "companyId": {
+      "type": "string",
+      "description": "An identifier for the company to which the asset belongs in Content Lake"
+    },
+    "spaceId": {
+      "type": "string",
+      "description": "An identifier for the space to which the asset belongs in Content Lake"
+    }
+  }
+}
