@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/adobe/content-lake-commons/compare/v1.5.1...v1.6.0) (2023-05-23)
+
+
+### Features
+
+* adding support to index storage to search across arbitrary fields ([c5c8421](https://github.com/adobe/content-lake-commons/commit/c5c84217cd3a9c65ade6b59c272ac308e0c69a44))
+
 ## [1.5.1](https://github.com/adobe/content-lake-commons/compare/v1.5.0...v1.5.1) (2023-05-20)
 
 
