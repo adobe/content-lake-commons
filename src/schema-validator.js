@@ -14,7 +14,12 @@ import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { readFile, readdir } from 'fs/promises';
 
-const SCHEMA_INGESTION_REQUEST = 'ingestion-request';
+export const SCHEMA_INGESTION_REQUEST = 'ingestion-request';
+export const SCHEMA_MARSHALLING_REQUEST = 'ingestion-request';
+export const SCHEMA_THUBMNAIL_GENERATION_REQUEST = 'thumbnail-generation-request';
+export const SCHEMA_ASSET_PROCESSING_REQUEST = 'asset-processing-request';
+export const SCHEMA_SERIALIZATION_REQUEST = 'serialization-request';
+export const SCHEMA_SERIALIZE_EXISTING_ASSET_REQUEST = 'serialize-existing-asset-request';
 
 /**
  * Loads schemas from this project in the <code>schemas</code> directory and supports validating
@@ -47,31 +52,35 @@ export class SchemaValidator {
   }
 
   /**
-   * Validates the <code>ingestionRequest</code> object against the Ingestion Request schema
+   * Validates a request object against the schema specified by <code>schemaName</code>
    * as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
+   *
+   * Throws <code>Error</code> if request does not match
+   *
    * @see https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract?
-   * @param {any} ingestionRequest
+   * @param {any} request
+   * @param {string} schemaName
    * @param {Array<string>} additionalRequiredData
    */
-  async validateIngestionRequest(ingestionRequest, additionalRequiredData) {
-    const schema = await this.#getSchema(SCHEMA_INGESTION_REQUEST);
-    const result = validate(ingestionRequest, schema, {
+  async validateRequest(request, schemaName, additionalRequiredData) {
+    const schema = await this.#getSchema(schemaName);
+    const result = validate(request, schema, {
       allowUnknownAttributes: false,
     });
     if (result.errors?.length > 0) {
       throw new Error(
-        `Failed to validate schema, errors: \n- ${result.errors
+        `Failed to validate schema "${schemaName}", errors: \n- ${result.errors
           .map((e) => e.message)
           .join('\n- ')}`,
       );
     }
     if (additionalRequiredData) {
       const missing = additionalRequiredData.filter(
-        (key) => !(key in ingestionRequest.data),
+        (key) => !(key in request.data),
       );
       if (missing.length > 0) {
         throw new Error(
-          `Failed to validate schema, missing data fields: [${missing.join(
+          `Failed to validate schema "${schemaName}", missing data fields: [${missing.join(
             ', ',
           )}]`,
         );
