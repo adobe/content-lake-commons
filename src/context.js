@@ -105,7 +105,7 @@ export class ContextHelper {
 
   /**
    * Get the logger from the context or return the console
-   * @returns {import('@adob')}
+   * @returns {import('./common-typedefs.js').Logger}
    */
   getLog() {
     return this.#context.log || console;
