@@ -10,7 +10,7 @@
  * governing permissions and limitations under the License.
  */
 
-export class MockSecretsStore {
+export class MockSecretsManager {
   secrets = {};
 
   reset() {

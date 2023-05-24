@@ -22,23 +22,31 @@ import {
 /**
  * @typedef SecretConfigExt
  * @property {SecretsManagerClient} [client]
+ * @property {string} application
+ * @property {string} [companyId]
+ * @property {string} [scope]
  *
  * @typedef {import('./common-typedefs.js').AwsConfig & SecretConfigExt} SecretConfig
  */
 
 export class SecretsManager {
+  #application;
+
   #client;
 
-  #namespace;
+  #group;
+
+  #scope;
 
   /**
-   * Creates a Configuration Manager
-   * @param {string} namespace the namespace for the secret
-   * @param {SecretConfig} config the configuration
+   * Creates a Secrets Manager
+   * @param {SecretConfig} [config] the configuration
    */
-  constructor(namespace, config) {
+  constructor(config) {
     this.#client = config.client || new SecretsManagerClient(config);
-    this.#namespace = namespace;
+    this.#application = config.application;
+    this.#group = config.companyId || 'shared';
+    this.#scope = config.scope || 'prod';
   }
 
   /**
@@ -47,7 +55,7 @@ export class SecretsManager {
    * @returns {string} the full key for accessing the secret
    */
   #makeKey(id) {
-    return `${this.#namespace}-${id}`;
+    return [this.#scope, this.#group, this.#application, id].join('/');
   }
 
   /**

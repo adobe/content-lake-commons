@@ -24,6 +24,10 @@ objects against the schemas.</p>
 <dd></dd>
 <dt><del><a href="#extractSqsRecords">extractSqsRecords()</a></del></dt>
 <dd></dd>
+<dt><a href="#Security.">Security.(allowedPermissions, actualPermissions)</a> ⇒ <code>boolean</code></dt>
+<dd><p>Checks to see if any of the allowed permissions are present in the actual permissions,
+using globbing expansion</p>
+</dd>
 </dl>
 
 ## Typedefs
@@ -46,9 +50,15 @@ objects against the schemas.</p>
 <dt><a href="#QueueRecord">QueueRecord</a> : <code>Object</code></dt>
 <dd></dd>
 <dt><a href="#Handler">Handler</a> ⇒ <code>Promise.&lt;Response&gt;</code></dt>
-<dd><p>Function for handling a routes inside Frankin / Content Lake services</p>
+<dd><p>Function for handling a routes inside Franklin / Content Lake services</p>
 </dd>
 <dt><a href="#SecretConfig">SecretConfig</a> : <code><a href="#AwsConfig">AwsConfig</a></code> | <code>SecretConfigExt</code></dt>
+<dd></dd>
+<dt><a href="#AuthenticationRequirement">AuthenticationRequirement</a> : <code>Object</code></dt>
+<dd></dd>
+<dt><a href="#TokenRequest">TokenRequest</a> : <code>Object</code></dt>
+<dd></dd>
+<dt><a href="#TokenPayload">TokenPayload</a> : <code>Object</code></dt>
 <dd></dd>
 </dl>
 
@@ -97,6 +107,19 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 ***Deprecated***
 
 **Kind**: global function  
+<a name="Security."></a>
+
+## Security.(allowedPermissions, actualPermissions) ⇒ <code>boolean</code>
+Checks to see if any of the allowed permissions are present in the actual permissions,
+using globbing expansion
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| allowedPermissions | <code>Array.&lt;string&gt;</code> | the list of permissions which are allowed |
+| actualPermissions | <code>Array.&lt;string&gt;</code> | the actual permissions from the request |
+
 <a name="BlobStorageConfig"></a>
 
 ## BlobStorageConfig : <code>Object</code>
@@ -200,7 +223,7 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 <a name="Handler"></a>
 
 ## Handler ⇒ <code>Promise.&lt;Response&gt;</code>
-Function for handling a routes inside Frankin / Content Lake services
+Function for handling a routes inside Franklin / Content Lake services
 
 **Kind**: global typedef  
 **Returns**: <code>Promise.&lt;Response&gt;</code> - the response from the request  
@@ -220,4 +243,47 @@ Function for handling a routes inside Frankin / Content Lake services
 | Name | Type |
 | --- | --- |
 | [client] | <code>SecretsManagerClient</code> | 
+| application | <code>string</code> | 
+| [companyId] | <code>string</code> | 
+| [scope] | <code>string</code> | 
+
+<a name="AuthenticationRequirement"></a>
+
+## AuthenticationRequirement : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| [allowedRoles] | <code>Array.&lt;string&gt;</code> | 
+| [allowedPermissions] | <code>Array.&lt;string&gt;</code> | 
+
+<a name="TokenRequest"></a>
+
+## TokenRequest : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| spaceId | <code>string</code> | the space for which the token will be generated |
+| roleKeys | <code>Array.&lt;string&gt;</code> | the role keys for which the token should be generated |
+| generator | <code>string</code> | provides attribution for the key in the description |
+| [expiresInMinutes] | <code>number</code> | the number of minutes before the token expires (or 14 days) |
+
+<a name="TokenPayload"></a>
+
+## TokenPayload : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| permissions | <code>Array.&lt;string&gt;</code> | the permissions granted to this token |
+| roles | <code>Array.&lt;string&gt;</code> | the permissions granted to this token |
+| sub | <code>string</code> | the subject (or identifier) for this token |
+| tenantId | <code>string</code> | the primary tenant for the token |
+| [tenantIds] | <code>Array.&lt;string&gt;</code> | the optional list of additional  allowed tenants for the token |
+| type | <code>string</code> | the type of the token |
+| exp | <code>number</code> | the timestamp at which the token will expire |
 

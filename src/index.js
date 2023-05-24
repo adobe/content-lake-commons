@@ -20,5 +20,6 @@ export * from './rest-error.js';
 export * from './router.js';
 export * from './schema-validator.js';
 export * from './secret.js';
+export * from './security.js';
 export { CloudSearchIndexStorage } from './cloud-search-index-storage.js';
 export * as mocks from './mocks/index.js';

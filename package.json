@@ -61,6 +61,8 @@
     "clone": "^2.1.2",
     "fetch-retry": "^5.0.4",
     "jsonschema": "^1.4.1",
+    "jsonwebtoken": "^9.0.0",
+    "minimatch": "^9.0.1",
     "node-fetch": "^3.3.1",
     "routington": "^1.0.3"
   }
