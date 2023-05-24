@@ -49,6 +49,8 @@ using globbing expansion</p>
 <dd></dd>
 <dt><a href="#QueueRecord">QueueRecord</a> : <code>Object</code></dt>
 <dd></dd>
+<dt><a href="#SecurityConfig">SecurityConfig</a></dt>
+<dd></dd>
 <dt><a href="#Handler">Handler</a> ⇒ <code>Promise.&lt;Response&gt;</code></dt>
 <dd><p>Function for handling a routes inside Franklin / Content Lake services</p>
 </dd>
@@ -220,6 +222,18 @@ using globbing expansion
 | messageAttributes | <code>Record.&lt;string, any&gt;</code> | 
 | eventSource | <code>string</code> | 
 
+<a name="SecurityConfig"></a>
+
+## SecurityConfig
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| authRequired; | <code>boolean</code> | 
+| [allowedRoles] | <code>Array.&lt;string&gt;</code> | 
+| [allowedPermissions] | <code>Array.&lt;string&gt;</code> | 
+
 <a name="Handler"></a>
 
 ## Handler ⇒ <code>Promise.&lt;Response&gt;</code>
@@ -230,9 +244,8 @@ Function for handling a routes inside Franklin / Content Lake services
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Request</code> | the request |
-| context | <code>UniversalContext</code> | the context of the request |
 | params | <code>Record.&lt;string, string&gt;</code> | the parameters parsed from the request |
+| info | <code>Object</code> | the   additional request information |
 
 <a name="SecretConfig"></a>
 

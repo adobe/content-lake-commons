@@ -98,8 +98,9 @@ export class Security {
    * @param {AuthenticationRequirement} [authentication] the requirements
    *    for authentication to succeed
    * @param {Request} req the request
+   * @returns {Promise<void>}
    */
-  authenticate(req, authentication) {
+  async authenticate(req, authentication) {
     const token = this.#getToken(req);
     const spaceId = this.#getRequiredHeader(req, 'x-space-id');
     const payload = jwt.decode(token);
