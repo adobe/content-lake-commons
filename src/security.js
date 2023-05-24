@@ -105,43 +105,30 @@ export class Security {
     const payload = jwt.decode(token);
 
     // first validate that the tenant is correct
-    if (
-      payload.tenantId !== spaceId
-      && !(payload.tenantIds || []).includes(spaceId)
-    ) {
+    if (payload.tenantId !== spaceId) {
       this.#log.debug(
         `Mismatched spaceId, expected ${spaceId}, found ${payload.tenantId}`,
       );
       throw new RestError(403);
     }
-    if (
-      authentication?.allowedRoles
-      && authentication.allowedRoles.length > 0
-    ) {
-      if (
-        !authentication.allowedRoles.some((role) => (payload.roles || []).includes(role))
-      ) {
+    const { allowedRoles } = authentication || {};
+    if (allowedRoles && allowedRoles.length > 0) {
+      const actualRoles = payload.roles || [];
+      if (!allowedRoles.some((role) => actualRoles.includes(role))) {
         this.#log.debug('Payload did not contain allowed roles', {
           allowedRoles: authentication.allowedRoles,
-          roles: payload.roles,
+          actualRoles,
         });
         throw new RestError(403);
       }
     }
 
-    if (
-      authentication?.allowedPermissions
-      && authentication.allowedPermissions.length > 0
-    ) {
+    const { allowedPermissions } = authentication || {};
+    if (allowedPermissions && allowedPermissions.length > 0) {
       const permissions = payload.permissions || [];
-      if (
-        !Security.#hasPermissions(
-          authentication.allowedPermissions,
-          permissions,
-        )
-      ) {
-        this.#log.debug('Payload did not contain allowed roles', {
-          allowedRoles: authentication.allowedRoles,
+      if (!Security.#hasPermissions(allowedPermissions, permissions)) {
+        this.#log.debug('Payload did not contain allowed permissions', {
+          allowedRoles: authentication.allowedPermissions,
           roles: payload.roles,
         });
         throw new RestError(403);

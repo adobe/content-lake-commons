@@ -12,7 +12,10 @@
 
 /* eslint-env mocha */
 import assert from 'assert';
+import nock from 'nock';
 import { LocalKeySecurity } from '../src/mocks/local-key-security.js';
+import { Security } from '../src/security.js';
+import { MockSecretsManager } from '../src/mocks/secrets.js';
 
 function createRequest(spaceId, token) {
   return new Request('http://localhost/', {
@@ -143,7 +146,10 @@ describe('Security Unit Tests', () => {
 
       it('disallows without role AND permissions', async () => {
         const request = createRequest('test-space', tenant1Token);
-        await assertFailsWithStatus(403, () => security.authenticate(request, { allowedRoles: ['admin'], allowedPermissions: ['app.read'] }));
+        await assertFailsWithStatus(403, () => security.authenticate(request, {
+          allowedRoles: ['admin'],
+          allowedPermissions: ['app.read'],
+        }));
       });
     });
 
@@ -162,10 +168,108 @@ describe('Security Unit Tests', () => {
         });
       });
 
-      it('disallowed with globbed permission', async () => {
+      it('disallowed with out any permission', async () => {
         const request = createRequest('test-space', tenant1Token);
-        security.authenticate(request, {
-          allowedPermissions: ['app.write', 'app.read'],
+        await assertFailsWithStatus(403, () => security.authenticate(request, {
+          allowedPermissions: ['app.write'],
+        }));
+      });
+    });
+  });
+
+  describe('generateToken', () => {
+    const TEST_URL = 'http://localhost:8080';
+    const secretsManager = new MockSecretsManager();
+
+    /**
+     * @type {nock.Scope}
+     */
+    let scope;
+
+    /**
+     * @type {Security}
+     */
+    let security;
+    before(() => {
+      scope = nock(TEST_URL);
+    });
+    beforeEach(() => {
+      security = new Security({
+        secretsManager,
+        env: { SECURITY_API_HOST: TEST_URL },
+      });
+    });
+
+    it('can get token', async () => {
+      scope.post('/auth/vendor').reply(200, {
+        token: 'test-auth-token',
+      });
+      scope
+        .get('/identity/resources/roles/v1')
+        .matchHeader('authorization', 'Bearer test-auth-token')
+        .reply(200, [
+          { id: 1, key: 'admin' },
+          { id: 2, key: 'user' },
+        ]);
+      scope
+        .post('/identity/resources/tenants/access-tokens/v1')
+        .matchHeader('authorization', 'Bearer test-auth-token')
+        .matchHeader('frontegg-tenant-id', 'test-space')
+        .reply(200, {
+          secret: 'test-token',
+        });
+      const token = await security.generateToken({
+        spaceId: 'test-space',
+        generator: 'test-generator',
+        roleKeys: ['admin'],
+      });
+      assert.strictEqual(token, 'test-token');
+    });
+
+    it('fails with 500 on get auth token failure', async () => {
+      scope.post('/auth/vendor').reply(401, 'GO AWAY!');
+      await assertFailsWithStatus(500, async () => {
+        await security.generateToken({
+          spaceId: 'test-space',
+          generator: 'test-generator',
+          roleKeys: ['admin'],
+        });
+      });
+    });
+
+    it('fails with 500 on get roles failure', async () => {
+      scope.post('/auth/vendor').reply(200, {
+        token: 'test-auth-token',
+      });
+      scope.get('/identity/resources/roles/v1').reply(401, 'GO AWAY!');
+      await assertFailsWithStatus(500, async () => {
+        await security.generateToken({
+          spaceId: 'test-space',
+          generator: 'test-generator',
+          roleKeys: ['admin'],
+        });
+      });
+    });
+
+    it('fails with 500 on get roles failure', async () => {
+      scope.post('/auth/vendor').reply(200, {
+        token: 'test-auth-token',
+      });
+      scope
+        .get('/identity/resources/roles/v1')
+        .matchHeader('authorization', 'Bearer test-auth-token')
+        .reply(200, [
+          { id: 1, key: 'admin' },
+          { id: 2, key: 'user' },
+        ]);
+      scope
+        .post('/identity/resources/tenants/access-tokens/v1')
+        .reply(401, 'GO AWAY!');
+      await assertFailsWithStatus(500, async () => {
+        await security.generateToken({
+          spaceId: 'test-space',
+          generator: 'test-generator',
+          roleKeys: ['admin'],
         });
       });
     });
