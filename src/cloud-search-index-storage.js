@@ -17,7 +17,34 @@ import clone from 'clone';
 import { ContextHelper } from './context.js';
 
 export class CloudSearchIndexStorage {
-  #FIELDS_TO_INDEX = new Set(['objectID', 'assetIdentity', 'contentHash', 'sourceName', 'sourceType', 'thumbnailHash', 'file', 'companyId', 'spaceId', 'type', 'tags', 'ocrTags', 'caption', 'width', 'height', 'color', 'sourceId', 'sourceUrl', 'sourceAssetId', 'sourcePath']);
+  #FIELDS_TO_INDEX = new Set([
+    'objectID',
+    'assetIdentity',
+    'contentHash',
+    'sourceName',
+    'sourceType',
+    'thumbnailHash',
+    'file',
+    'companyId',
+    'spaceId',
+    'type',
+    'tags',
+    'caption',
+    'ocrTags',
+    'width',
+    'height',
+    'date',
+    'color',
+    'sourceId',
+    'sourceUrl',
+    'sourceAssetId',
+    'sourcePath',
+    'assetStatus',
+    'sourceMimeType',
+    'sourceSize',
+    'sourceWidth',
+    'sourceHeight',
+  ]);
   #INDEX_PREFIX = 'company';
   #log;
   #index;
@@ -47,33 +74,38 @@ export class CloudSearchIndexStorage {
    *
    * Needs to have both the sourceId and the contentHash (source binary hash) matching
    * @param {Object} query
-   * @returns Object of hits if there is a hit or false if it doesn't exist
+   * @returns {Promise<any[] | false>} Object of hits if there is a hit or false if it doesn't exist
    */
   async exists(query) {
-    const facetFilters = [];
     // if no contentHash, we don't want to match just on the sourceId
     // because that is not reliable so we will not return a match
-    if (!query || !query.contentHash) {
-      this.#log.info('Missing query.contentHash, no existence in the record storage.');
+    if (!query?.contentHash) {
+      this.#log.info(
+        'Missing query.contentHash, no existence in the record storage.',
+      );
       return false;
     }
+    const searchResult = await this.find(query);
+    return searchResult || false;
+  }
 
-    facetFilters.push(`contentHash:${query.contentHash}`);
-
-    if (query.sourceAssetId) {
-      facetFilters.push(`sourceAssetId:${query.sourceAssetId}`);
-    }
-
-    const searchResult = await this.#index.search(
-      '',
-      {
-        facetFilters,
-      },
+  /**
+   * Searches the index for documents matching the specified query values
+   *
+   * @param {Record<string,any>} query the query by which to search
+   * @returns {Promise<Array<any>>} the results from the query
+   */
+  async find(query) {
+    const facetFilters = Object.keys(query).map(
+      (key) => `${key}:${query[key]}`,
     );
-    if (searchResult?.nbHits > 0) {
-      return searchResult?.hits;
+    const searchResult = await this.#index.search('', {
+      facetFilters,
+    });
+    if (searchResult?.hits?.length === 0) {
+      return false;
     }
-    return false;
+    return searchResult?.hits || [];
   }
 
   /**
@@ -190,7 +222,7 @@ export class CloudSearchIndexStorage {
   /**
    * Delete record from index
    * @param {String} objectID unique identifier for the index record
-   * @returns
+   * @returns {Promise<any>}
    */
   async delete(objectID) {
     return this.#index.deleteObject(objectID);

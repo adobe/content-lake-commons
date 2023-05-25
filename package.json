@@ -1,6 +1,6 @@
 {
   "name": "@adobe/content-lake-commons",
-  "version": "1.5.0",
+  "version": "1.6.1",
   "description": "Content Lake - Commons",
   "main": "src/index.js",
   "type": "module",
@@ -35,7 +35,7 @@
     "@semantic-release/npm": "10.0.3",
     "c8": "7.13.0",
     "dotenv": "^16.0.3",
-    "eslint": "8.40.0",
+    "eslint": "8.41.0",
     "husky": "8.0.3",
     "jsdoc-plugin-intersection": "^1.0.4",
     "jsdoc-to-markdown": "8.0.0",

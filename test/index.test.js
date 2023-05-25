@@ -18,6 +18,7 @@ import {
   contextHelper,
   ContextHelper,
   FetchRetry,
+  mocks,
   QueueClient,
   RestError,
   Router,
@@ -40,6 +41,13 @@ describe('Index Tests', () => {
 
   it('export FetchRetry is present', async () => {
     assert.ok(FetchRetry);
+  });
+
+  it('export mocks is present', async () => {
+    assert.ok(mocks);
+    assert.ok(mocks.LocalSearchIndexStorage);
+    assert.ok(mocks.MockQueueClient);
+    assert.ok(mocks.MockSecretsStore);
   });
 
   it('export QueueClient is present', async () => {
