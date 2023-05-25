@@ -79,4 +79,8 @@ export class SchemaValidator {
       }
     }
   }
+
+  async validateIngestionRequest(request, additionalRequiredData) {
+    return this.validateRequest(request, SCHEMA_INGESTION_REQUEST, additionalRequiredData);
+  }
 }
