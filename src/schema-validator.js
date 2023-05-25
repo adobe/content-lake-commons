@@ -15,42 +15,33 @@ import { fileURLToPath } from 'url';
 import { readFile, readdir } from 'fs/promises';
 
 export const SCHEMA_INGESTION_REQUEST = 'ingestion-request';
-export const SCHEMA_MARSHALLING_REQUEST = 'ingestion-request';
-export const SCHEMA_THUBMNAIL_GENERATION_REQUEST = 'thumbnail-generation-request';
-export const SCHEMA_ASSET_PROCESSING_REQUEST = 'asset-processing-request';
-export const SCHEMA_SERIALIZATION_REQUEST = 'serialization-request';
-export const SCHEMA_SERIALIZE_EXISTING_ASSET_REQUEST = 'serialize-existing-asset-request';
+
+const schemas = {};
+
+export async function getSchema(name, dir) {
+  if (!Object.keys(schemas).length) {
+    let schemasDir = dir;
+    if (!dir) {
+      schemasDir = join(dirname(fileURLToPath(import.meta.url)), 'schemas');
+    }
+    const schemaFiles = await readdir(schemasDir);
+    await Promise.all(
+      schemaFiles.filter((fileName) => fileName.endsWith('.json'))
+        .map(async (fileName) => {
+          schemas[fileName.slice(0, -5)] = JSON.parse(
+            (await readFile(join(schemasDir, fileName))).toString(),
+          );
+        }),
+    );
+  }
+  return schemas[name];
+}
 
 /**
  * Loads schemas from this project in the <code>schemas</code> directory and supports validating
  * objects against the schemas.
  */
 export class SchemaValidator {
-  #loaded = false;
-
-  #schemas = {};
-
-  async #getSchema(name) {
-    if (!this.#loaded) {
-      const schemasDir = join(
-        dirname(fileURLToPath(import.meta.url)),
-        'schemas',
-      );
-      const schemas = await readdir(schemasDir);
-      await Promise.all(
-        schemas
-          .filter((fileName) => fileName.endsWith('.json'))
-          .map(async (fileName) => {
-            const schemaName = fileName.slice(0, -5);
-            const schemaBuf = await readFile(join(schemasDir, fileName));
-            this.#schemas[schemaName] = JSON.parse(schemaBuf.toString());
-          }),
-      );
-      this.#loaded = true;
-    }
-    return this.#schemas[name];
-  }
-
   /**
    * Validates a request object against the schema specified by <code>schemaName</code>
    * as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
@@ -62,8 +53,9 @@ export class SchemaValidator {
    * @param {string} schemaName
    * @param {Array<string>} additionalRequiredData
    */
+  // eslint-disable-next-line class-methods-use-this
   async validateRequest(request, schemaName, additionalRequiredData) {
-    const schema = await this.#getSchema(schemaName);
+    const schema = await getSchema(schemaName);
     const result = validate(request, schema, {
       allowUnknownAttributes: false,
     });
