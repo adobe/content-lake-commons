@@ -27,7 +27,7 @@ dotenv.config();
 const SLOW_TEST_TIMEOUT = 5000;
 
 describe('Secrets Manager Integration Tests', async () => {
-  const defaultConfig = { scope: 'test', application: 'commons-it' };
+  const defaultConfig = { scope: 'test', application: 'commons-secrets-it' };
   const helper = new ContextHelper(process);
   it('fails on non-existing secret', async () => {
     const mgr = new SecretsManager({
@@ -85,7 +85,7 @@ describe('Secrets Manager Integration Tests', async () => {
       .then((res) => {
         Promise.all(
           res.SecretList.filter(
-            (secret) => secret.Name.startsWith('test') || secret.Name.startsWith('it'),
+            (secret) => secret.Name.startsWith('test/shared/commons-secrets-it/'),
           ).map((secret) => secretManager.send(
             new DeleteSecretCommand({
               SecretId: secret.Name,
