@@ -16,47 +16,47 @@ import { readFile, readdir } from 'fs/promises';
 
 export const SCHEMA_INGESTION_REQUEST = 'ingestion-request';
 
-const schemas = {};
-
-export async function getSchema(name, dir) {
-  if (!Object.keys(schemas).length) {
-    let schemasDir = dir;
-    if (!dir) {
-      schemasDir = join(dirname(fileURLToPath(import.meta.url)), 'schemas');
-    }
-    const schemaFiles = await readdir(schemasDir);
-    await Promise.all(
-      schemaFiles.filter((fileName) => fileName.endsWith('.json'))
-        .map(async (fileName) => {
-          schemas[fileName.slice(0, -5)] = JSON.parse(
-            (await readFile(join(schemasDir, fileName))).toString(),
-          );
-        }),
-    );
-  }
-  return schemas[name];
-}
-
 /**
  * Loads schemas from this project in the <code>schemas</code> directory and supports validating
  * objects against the schemas.
  */
 export class SchemaValidator {
+  #schemas = {};
+
+  async loadSchemas(dir) {
+    const schemasDir = dir || join(dirname(fileURLToPath(import.meta.url)), 'schemas');
+    const schemaFiles = await readdir(schemasDir);
+    await Promise.all(
+      schemaFiles.filter((fileName) => fileName.endsWith('.json'))
+        .map(async (fileName) => {
+          this.#schemas[fileName.slice(0, -5)] = JSON.parse(
+            (await readFile(join(schemasDir, fileName))).toString(),
+          );
+        }),
+    );
+  }
+
+  async getSchema(name, dir) {
+    if (!Object.keys(this.#schemas).length) {
+      await this.loadSchemas(dir);
+    }
+    return this.#schemas[name];
+  }
+
   /**
-   * Validates a request object against the schema specified by <code>schemaName</code>
+   * Validates an object against the schema specified by <code>schemaName</code>
    * as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
    *
    * Throws <code>Error</code> if request does not match
    *
    * @see https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract?
-   * @param {any} request
+   * @param {any} obj
    * @param {string} schemaName
    * @param {Array<string>} additionalRequiredData
    */
-  // eslint-disable-next-line class-methods-use-this
-  async validateRequest(request, schemaName, additionalRequiredData) {
-    const schema = await getSchema(schemaName);
-    const result = validate(request, schema, {
+  async validateObject(obj, schemaName, additionalRequiredData) {
+    const schema = await this.getSchema(schemaName);
+    const result = validate(obj, schema, {
       allowUnknownAttributes: false,
     });
     if (result.errors?.length > 0) {
@@ -68,7 +68,7 @@ export class SchemaValidator {
     }
     if (additionalRequiredData) {
       const missing = additionalRequiredData.filter(
-        (key) => !(key in request.data),
+        (key) => !(key in obj.data),
       );
       if (missing.length > 0) {
         throw new Error(

@@ -36,7 +36,7 @@ describe('Schema Validator Tests', () => {
   const validator = new SchemaValidator();
   describe('validateIngestionRequest', () => {
     it('validates full object', async () => {
-      await validator.validateRequest(
+      await validator.validateObject(
         {
           data: {
             sourceAssetId: '2D155092-F458-4DDC-A00C-3B003C55EF54',
@@ -69,7 +69,7 @@ describe('Schema Validator Tests', () => {
     });
 
     it('validates limited object', async () => {
-      await validator.validateRequest(SMALL_REQ, SCHEMA_INGESTION_REQUEST);
+      await validator.validateObject(SMALL_REQ, SCHEMA_INGESTION_REQUEST);
     });
 
     it('fails on unexpected keys', async () => {

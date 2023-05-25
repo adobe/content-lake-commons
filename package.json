@@ -40,6 +40,7 @@
     "jsdoc-plugin-intersection": "^1.0.4",
     "jsdoc-to-markdown": "8.0.0",
     "jsdoc-tsimport-plugin": "^1.0.5",
+    "jsonschema": "^1.4.1",
     "junit-report-builder": "3.0.1",
     "lint-staged": "13.2.2",
     "mocha": "10.2.0",
@@ -60,7 +61,6 @@
     "algoliasearch": "^4.17.0",
     "clone": "^2.1.2",
     "fetch-retry": "^5.0.4",
-    "jsonschema": "^1.4.1",
     "node-fetch": "^3.3.1",
     "routington": "^1.0.3"
   }
