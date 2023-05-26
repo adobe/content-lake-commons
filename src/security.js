@@ -12,6 +12,7 @@
 import jwt from 'jsonwebtoken';
 import { minimatch } from 'minimatch';
 import fetch from 'node-fetch';
+import { promisify } from 'util';
 import { ContextHelper } from './context.js';
 import { RestError } from './rest-error.js';
 import { SecretsManager } from './secret.js';
@@ -68,8 +69,9 @@ export class Security {
    * @returns {boolean}
    */
   static #hasPermissions(allowedPermissions, actualPermissions) {
-    return allowedPermissions
-      .some((required) => actualPermissions.some((granted) => minimatch(required, granted)));
+    return allowedPermissions.some((required) =>
+      actualPermissions.some((granted) => minimatch(required, granted)),
+    );
   }
 
   /**
@@ -99,8 +101,9 @@ export class Security {
     const helper = new ContextHelper(context);
     this.#apiHost = helper.getEnv().SECURITY_API_HOST || FRONTEGG_HOST;
     this.#log = helper.getLog();
-    this.#secretsManager = context.secretsManager
-      || new SecretsManager({
+    this.#secretsManager =
+      context.secretsManager ||
+      new SecretsManager({
         ...helper.extractAwsConfig(),
         application: 'frontegg',
         scope: context.scope,
@@ -327,14 +330,7 @@ export class Security {
     if (!this.#certificate) {
       this.#certificate = await this.#secretsManager.getSecret('public-key');
     }
-    return new Promise((resolve, reject) => {
-      jwt.verify(token, this.#certificate, (err, user) => {
-        if (err) {
-          this.#log.warn('Failed to verify authorization', err);
-          reject(new RestError(401));
-        }
-        resolve(user);
-      });
-    });
+    const verify = promisify((cb) => jwt.verify(token, this.#certificate, cb));
+    await verify();
   }
 }

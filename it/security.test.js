@@ -14,6 +14,7 @@
 import assert from 'assert';
 import * as dotenv from 'dotenv';
 import { Security } from '../src/security.js';
+import { LocalKeySecurity } from '../src/mocks/local-key-security.js';
 
 dotenv.config();
 
@@ -31,6 +32,7 @@ function createRequest(token) {
 
 describe('Security Integration Tests', async () => {
   const security = new Security({ ...process, scope: 'test' });
+
   it('can generate and authorize tokens', async () => {
     const token = await security.generateToken({
       generator: 'Commons Security IT',
@@ -40,4 +42,26 @@ describe('Security Integration Tests', async () => {
     assert.ok(token);
     await security.authorize(createRequest(token));
   }).timeout(SLOW_TEST_TIMEOUT);
+
+  it('generate fails without roles', async () => {
+    await assert.rejects(() => security.generateToken({
+      generator: 'Commons Security IT',
+      spaceId,
+      roleKeys: [],
+    }));
+  });
+
+  it('will not authorize invalid token', async () => {
+    await assert.rejects(() => security.authorize(createRequest('not a valid token')));
+  });
+
+  it('will not authorize token generated elsewhere', async () => {
+    const localSecurity = new LocalKeySecurity();
+    const key = await localSecurity.generateToken({
+      generator: 'Commons Security IT',
+      spaceId,
+      roleKeys: ['Admin'],
+    });
+    await assert.rejects(() => security.authorize(createRequest(key)));
+  });
 });
