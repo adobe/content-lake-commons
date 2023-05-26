@@ -46,8 +46,22 @@ const BEARER_OFFSET = 7;
 
 export class Security {
   /**
-   * Checks to see if any of the allowed permissions are present in the actual permissions,
-   * using globbing expansion
+   * Checks to see if any of the allowed permissions are present in the actualPermissions,
+   * using globbing expansion.
+   *
+   * The following would return true:
+   * <pre>
+   * allowedPermissions=['app.read']; actualPermissions=['app.read','app.write']
+   * allowedPermissions=['app.write']; actualPermissions=['app.*']
+   * </pre>
+   *
+   * The following would return false:
+   *
+   * <pre>
+   * allowedPermissions=['app.write']; actualPermissions=['app.read']
+   * allowedPermissions=['app2.read']; actualPermissions=['app.*']
+   * </pre>
+   *
    * @param {Array<string>} allowedPermissions the list of permissions which are allowed
    * @param {Array<string>} actualPermissions the actual permissions from the request
    * @returns {boolean}
