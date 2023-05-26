@@ -120,7 +120,7 @@ export class Router {
       suffix = '/';
     }
     if (this.methods[request.method]) {
-      log.debug('Handing request', { method, suffix });
+      log.debug('Handling request', { method, suffix });
       const match = this.methods[method].match(suffix);
       if (match && match.node.handler) {
         try {
