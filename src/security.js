@@ -17,6 +17,7 @@ import { RestError } from './rest-error.js';
 import { SecretsManager } from './secret.js';
 
 const BEARER_OFFSET = 7;
+const FRONTEGG_HOST = 'https://api.frontegg.com';
 
 /**
  * @typedef {Object} AuthenticationRequirement
@@ -96,7 +97,7 @@ export class Security {
 
   constructor(context) {
     const helper = new ContextHelper(context);
-    this.#apiHost = helper.getEnv().SECURITY_API_HOST || 'https://api.frontegg.com';
+    this.#apiHost = helper.getEnv().SECURITY_API_HOST || FRONTEGG_HOST;
     this.#log = helper.getLog();
     this.#secretsManager = context.secretsManager
       || new SecretsManager({
@@ -186,7 +187,6 @@ export class Security {
   }
 
   /**
-   *
    * @param {string} authToken
    * @param {string} spaceId
    * @param {string} generator
