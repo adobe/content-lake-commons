@@ -25,9 +25,19 @@ objects against the schemas.</p>
 <dt><del><a href="#extractSqsRecords">extractSqsRecords()</a></del></dt>
 <dd></dd>
 <dt><a href="#Security.">Security.(allowedPermissions, actualPermissions)</a> ⇒ <code>boolean</code></dt>
-<dd><p>Checks to see if any of the allowed permissions are present in the actual permissions,
-using globbing expansion</p>
-</dd>
+<dd><p>Checks to see if any of the allowed permissions are present in the actualPermissions,
+using globbing expansion.</p>
+<p>The following would return true:</p>
+<pre>
+allowedPermissions=['app.read']; actualPermissions=['app.read','app.write']
+allowedPermissions=['app.write']; actualPermissions=['app.*']
+</pre>
+
+<p>The following would return false:</p>
+<pre>
+allowedPermissions=['app.write']; actualPermissions=['app.read']
+allowedPermissions=['app2.read']; actualPermissions=['app.*']
+</pre></dd>
 </dl>
 
 ## Typedefs
@@ -112,8 +122,21 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 <a name="Security."></a>
 
 ## Security.(allowedPermissions, actualPermissions) ⇒ <code>boolean</code>
-Checks to see if any of the allowed permissions are present in the actual permissions,
-using globbing expansion
+Checks to see if any of the allowed permissions are present in the actualPermissions,
+using globbing expansion.
+
+The following would return true:
+<pre>
+allowedPermissions=['app.read']; actualPermissions=['app.read','app.write']
+allowedPermissions=['app.write']; actualPermissions=['app.*']
+</pre>
+
+The following would return false:
+
+<pre>
+allowedPermissions=['app.write']; actualPermissions=['app.read']
+allowedPermissions=['app2.read']; actualPermissions=['app.*']
+</pre>
 
 **Kind**: global function  
 
