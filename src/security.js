@@ -69,9 +69,8 @@ export class Security {
    * @returns {boolean}
    */
   static #hasPermissions(allowedPermissions, actualPermissions) {
-    return allowedPermissions.some((required) =>
-      actualPermissions.some((granted) => minimatch(required, granted)),
-    );
+    return allowedPermissions
+      .some((required) => actualPermissions.some((granted) => minimatch(required, granted)));
   }
 
   /**
@@ -101,9 +100,8 @@ export class Security {
     const helper = new ContextHelper(context);
     this.#apiHost = helper.getEnv().SECURITY_API_HOST || FRONTEGG_HOST;
     this.#log = helper.getLog();
-    this.#secretsManager =
-      context.secretsManager ||
-      new SecretsManager({
+    this.#secretsManager = context.secretsManager
+      || new SecretsManager({
         ...helper.extractAwsConfig(),
         application: 'frontegg',
         scope: context.scope,
