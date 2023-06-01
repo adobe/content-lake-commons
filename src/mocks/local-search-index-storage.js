@@ -18,6 +18,17 @@ export class LocalSearchIndexStorage {
     this.onSaveCallback = undefined;
   }
 
+  async delete(objectID) {
+    delete this.records[objectID];
+  }
+
+  async deleteBy(key, value) {
+    const search = {};
+    search[key] = value;
+    const res = await this.find(search);
+    await Promise.all(res.map((obj) => this.delete(obj.objectID)));
+  }
+
   async exists(query) {
     const queryContentHash = query?.contentHash;
     if (!queryContentHash) {
