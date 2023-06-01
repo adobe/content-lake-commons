@@ -34,18 +34,12 @@ $ npm test
 ```
 ### Integration Tests
 
-The Integration Tests require the following environment variables which can be supplied in a .env file:
+The Integration Tests require the following environment variables which can be extracted from Vault by:
 
-```
-AWS_ACCESS_KEY_ID=
-AWS_SECRET_ACCESS_KEY=
-AWS_REGION=
-QUEUE_URL=
+ 1. create a .env file with the contents `# VAULT_PATHS /dx_aem_content_lake/dev/aws/content-lake-circle-ci-user /dx_aem_content_lake/local/sqs /dx_aem_content_lake/local/frontegg`
+ 2. run the script [update-env.sh](https://github.com/adobe/content-lake-infra/blob/main/update-env.sh), ex: `./update.env ../content-lake-commons/.env`
 
-ALGOLIA_APP_NAME=
-ALGOLIA_API_KEY=
-ALGOLIA_CI_INDEX=
-```
+ Run the test with:
 
 ```bash
 $ npm test:integration

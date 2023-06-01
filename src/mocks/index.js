@@ -11,5 +11,6 @@
  */
 
 export * from './local-search-index-storage.js';
+export * from './local-key-security.js';
 export * from './queue.js';
 export * from './secrets.js';

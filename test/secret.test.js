@@ -26,27 +26,61 @@ describe('SecretsManager Unit Tests', () => {
 
   it('can get secret', async () => {
     const mockClient = new MockAwsClient();
-    const manager = new SecretsManager('test-ns', { client: mockClient });
+    const manager = new SecretsManager({
+      client: mockClient,
+      application: 'test-app',
+    });
     mockClient.resp = {
       SecretString: 'test-secret',
     };
     const resp = await manager.getSecret('test-id');
     assert.strictEqual(resp, 'test-secret');
-    assert.strictEqual(mockClient.req.input.SecretId, 'test-ns-test-id');
+    assert.strictEqual(
+      mockClient.req.input.SecretId,
+      'prod/shared/test-app/test-id',
+    );
   });
 
   it('can put secret', async () => {
     const mockClient = new MockAwsClient();
-    const manager = new SecretsManager('test-ns', { client: mockClient });
+    const manager = new SecretsManager({
+      client: mockClient,
+      application: 'test-app',
+    });
     await manager.putSecret('test-id', 'test-secret');
-    assert.strictEqual(mockClient.req.input.SecretId, 'test-ns-test-id');
+    assert.strictEqual(
+      mockClient.req.input.SecretId,
+      'prod/shared/test-app/test-id',
+    );
+    assert.strictEqual(mockClient.req.input.SecretString, 'test-secret');
+  });
+
+  it('can change app and scope', async () => {
+    const mockClient = new MockAwsClient();
+    const manager = new SecretsManager({
+      client: mockClient,
+      application: 'test-app2',
+      companyId: 'test-company',
+      scope: 'test',
+    });
+    await manager.putSecret('test-id', 'test-secret');
+    assert.strictEqual(
+      mockClient.req.input.SecretId,
+      'test/test-company/test-app2/test-id',
+    );
     assert.strictEqual(mockClient.req.input.SecretString, 'test-secret');
   });
 
   it('can delete secret', async () => {
     const mockClient = new MockAwsClient();
-    const manager = new SecretsManager('test-ns', { client: mockClient });
+    const manager = new SecretsManager({
+      client: mockClient,
+      application: 'test-app',
+    });
     await manager.deleteSecret('test-id');
-    assert.strictEqual(mockClient.req.input.SecretId, 'test-ns-test-id');
+    assert.strictEqual(
+      mockClient.req.input.SecretId,
+      'prod/shared/test-app/test-id',
+    );
   });
 });

@@ -14,6 +14,7 @@
 import assert from 'assert';
 import { Request, Response } from 'node-fetch';
 import { randomUUID } from 'crypto';
+import { LocalKeySecurity } from '../src/mocks/local-key-security.js';
 import { Router } from '../src/router.js';
 
 function mockContext(suffix) {
@@ -41,6 +42,84 @@ describe('Router Tests', () => {
     assert.strictEqual(response.status, 200);
     const body = await response.text();
     assert.strictEqual(body, 'Hello World');
+  });
+
+  it('passes expected parameters to handler', async () => {
+    const router = new Router();
+    router.get('/:value', (params, info) => {
+      assert.ok(params);
+      assert.strictEqual(params.value, 'testpath');
+      assert.ok(info.request);
+      assert.ok(info.context);
+      return new Response('');
+    });
+    const response = await router.handle(
+      new Request('https://localhost/'),
+      mockContext('/testpath'),
+    );
+    assert.ok(response);
+    assert.strictEqual(response.status, 200);
+  });
+
+  it('can add security', async () => {
+    const security = new LocalKeySecurity();
+    const token = await security.generateToken({
+      spaceId: 'test-space',
+      roleKeys: ['admin'],
+    });
+    const router = new Router().withSecurity(security);
+    router.get('/', () => new Response(''), { authRequired: true });
+
+    const response = await router.handle(
+      new Request('https://localhost/', {
+        headers: {
+          authorization: `Bearer ${token}`,
+          'x-space-id': 'test-space',
+        },
+      }),
+      mockContext('/'),
+    );
+    assert.ok(response);
+    assert.strictEqual(response.status, 200);
+  });
+
+  it('security will reject invalid requests', async () => {
+    const security = new LocalKeySecurity();
+    const token = await security.generateToken({
+      spaceId: 'test-space',
+      roleKeys: ['admin'],
+    });
+    const router = new Router().withSecurity(security);
+    router.get('/', () => new Response(''), { authRequired: true });
+
+    const response = await router.handle(
+      new Request('https://localhost/', {
+        headers: {
+          authorization: `Bearer ${token}`,
+          'x-space-id': 'test-space2',
+        },
+      }),
+      mockContext('/'),
+    );
+    assert.ok(response);
+    assert.strictEqual(response.status, 403);
+  });
+
+  it('will fail if security requested by not provided', async () => {
+    const router = new Router();
+    router.get('/', () => new Response(''), { authRequired: true });
+
+    const response = await router.handle(
+      new Request('https://localhost/', {
+        headers: {
+          authorization: 'Bearer yourbearerhere',
+          'x-space-id': 'test-space2',
+        },
+      }),
+      mockContext('/'),
+    );
+    assert.ok(response);
+    assert.strictEqual(response.status, 500);
   });
 
   it('can route different request', async () => {
@@ -139,7 +218,7 @@ describe('Router Tests', () => {
     );
   });
 
-  it('doesnt fail if pathInfo not defined', async () => {
+  it('does not fail if pathInfo not defined', async () => {
     const router = new Router().get('/', () => new Response('GET'));
     const response = await router.handle(
       new Request('https://localhost/', { method: 'GET' }),

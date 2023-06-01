@@ -24,6 +24,7 @@ import {
   Router,
   SchemaValidator,
   SecretsManager,
+  Security,
 } from '../src/index.js';
 
 describe('Index Tests', () => {
@@ -47,7 +48,7 @@ describe('Index Tests', () => {
     assert.ok(mocks);
     assert.ok(mocks.LocalSearchIndexStorage);
     assert.ok(mocks.MockQueueClient);
-    assert.ok(mocks.MockSecretsStore);
+    assert.ok(mocks.MockSecretsManager);
   });
 
   it('export QueueClient is present', async () => {
@@ -68,5 +69,9 @@ describe('Index Tests', () => {
 
   it('export SecretsManager is present', async () => {
     assert.ok(SecretsManager);
+  });
+
+  it('export Security is present', async () => {
+    assert.ok(Security);
   });
 });

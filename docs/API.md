@@ -24,6 +24,20 @@ objects against the schemas.</p>
 <dd></dd>
 <dt><del><a href="#extractSqsRecords">extractSqsRecords()</a></del></dt>
 <dd></dd>
+<dt><a href="#Security.">Security.(allowedPermissions, actualPermissions)</a> ⇒ <code>boolean</code></dt>
+<dd><p>Checks to see if any of the allowed permissions are present in the actualPermissions,
+using globbing expansion.</p>
+<p>The following would return true:</p>
+<pre>
+allowedPermissions=['app.read']; actualPermissions=['app.read','app.write']
+allowedPermissions=['app.write']; actualPermissions=['app.*']
+</pre>
+
+<p>The following would return false:</p>
+<pre>
+allowedPermissions=['app.write']; actualPermissions=['app.read']
+allowedPermissions=['app2.read']; actualPermissions=['app.*']
+</pre></dd>
 </dl>
 
 ## Typedefs
@@ -45,10 +59,18 @@ objects against the schemas.</p>
 <dd></dd>
 <dt><a href="#QueueRecord">QueueRecord</a> : <code>Object</code></dt>
 <dd></dd>
+<dt><a href="#SecurityConfig">SecurityConfig</a></dt>
+<dd></dd>
 <dt><a href="#Handler">Handler</a> ⇒ <code>Promise.&lt;Response&gt;</code></dt>
-<dd><p>Function for handling a routes inside Frankin / Content Lake services</p>
+<dd><p>Function for handling a routes inside Franklin / Content Lake services</p>
 </dd>
 <dt><a href="#SecretConfig">SecretConfig</a> : <code><a href="#AwsConfig">AwsConfig</a></code> | <code>SecretConfigExt</code></dt>
+<dd></dd>
+<dt><a href="#AuthenticationRequirement">AuthenticationRequirement</a> : <code>Object</code></dt>
+<dd></dd>
+<dt><a href="#TokenRequest">TokenRequest</a> : <code>Object</code></dt>
+<dd></dd>
+<dt><a href="#TokenPayload">TokenPayload</a> : <code>Object</code></dt>
 <dd></dd>
 </dl>
 
@@ -59,18 +81,21 @@ Loads schemas from this project in the <code>schemas</code> directory and suppor
 objects against the schemas.
 
 **Kind**: global class  
-<a name="SchemaValidator+validateIngestionRequest"></a>
+<a name="SchemaValidator+validateObject"></a>
 
-### schemaValidator.validateIngestionRequest(ingestionRequest, additionalRequiredData)
-Validates the <code>ingestionRequest</code> object against the Ingestion Request schema
+### schemaValidator.validateObject(obj, schemaName, additionalRequiredData)
+Validates an object against the schema specified by <code>schemaName</code>
 as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
+
+Throws <code>Error</code> if request does not match
 
 **Kind**: instance method of [<code>SchemaValidator</code>](#SchemaValidator)  
 **See**: https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract?  
 
 | Param | Type |
 | --- | --- |
-| ingestionRequest | <code>any</code> | 
+| obj | <code>any</code> | 
+| schemaName | <code>string</code> | 
 | additionalRequiredData | <code>Array.&lt;string&gt;</code> | 
 
 <a name="extractAwsConfig"></a>
@@ -97,6 +122,32 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 ***Deprecated***
 
 **Kind**: global function  
+<a name="Security."></a>
+
+## Security.(allowedPermissions, actualPermissions) ⇒ <code>boolean</code>
+Checks to see if any of the allowed permissions are present in the actualPermissions,
+using globbing expansion.
+
+The following would return true:
+<pre>
+allowedPermissions=['app.read']; actualPermissions=['app.read','app.write']
+allowedPermissions=['app.write']; actualPermissions=['app.*']
+</pre>
+
+The following would return false:
+
+<pre>
+allowedPermissions=['app.write']; actualPermissions=['app.read']
+allowedPermissions=['app2.read']; actualPermissions=['app.*']
+</pre>
+
+**Kind**: global function  
+
+| Param | Type | Description |
+| --- | --- | --- |
+| allowedPermissions | <code>Array.&lt;string&gt;</code> | the list of permissions which are allowed |
+| actualPermissions | <code>Array.&lt;string&gt;</code> | the actual permissions from the request |
+
 <a name="BlobStorageConfig"></a>
 
 ## BlobStorageConfig : <code>Object</code>
@@ -197,19 +248,30 @@ as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
 | messageAttributes | <code>Record.&lt;string, any&gt;</code> | 
 | eventSource | <code>string</code> | 
 
+<a name="SecurityConfig"></a>
+
+## SecurityConfig
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| authRequired; | <code>boolean</code> | 
+| [allowedRoles] | <code>Array.&lt;string&gt;</code> | 
+| [allowedPermissions] | <code>Array.&lt;string&gt;</code> | 
+
 <a name="Handler"></a>
 
 ## Handler ⇒ <code>Promise.&lt;Response&gt;</code>
-Function for handling a routes inside Frankin / Content Lake services
+Function for handling a routes inside Franklin / Content Lake services
 
 **Kind**: global typedef  
 **Returns**: <code>Promise.&lt;Response&gt;</code> - the response from the request  
 
 | Param | Type | Description |
 | --- | --- | --- |
-| req | <code>Request</code> | the request |
-| context | <code>UniversalContext</code> | the context of the request |
 | params | <code>Record.&lt;string, string&gt;</code> | the parameters parsed from the request |
+| info | <code>Object</code> | the   additional request information |
 
 <a name="SecretConfig"></a>
 
@@ -220,4 +282,47 @@ Function for handling a routes inside Frankin / Content Lake services
 | Name | Type |
 | --- | --- |
 | [client] | <code>SecretsManagerClient</code> | 
+| application | <code>string</code> | 
+| [companyId] | <code>string</code> | 
+| [scope] | <code>string</code> | 
+
+<a name="AuthenticationRequirement"></a>
+
+## AuthenticationRequirement : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type |
+| --- | --- |
+| [allowedRoles] | <code>Array.&lt;string&gt;</code> | 
+| [allowedPermissions] | <code>Array.&lt;string&gt;</code> | 
+
+<a name="TokenRequest"></a>
+
+## TokenRequest : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| spaceId | <code>string</code> | the space for which the token will be generated |
+| roleKeys | <code>Array.&lt;string&gt;</code> | the role keys for which the token should be generated |
+| generator | <code>string</code> | provides attribution for the key in the description |
+| [expiresInMinutes] | <code>number</code> | the number of minutes before the token expires (or 14 days) |
+
+<a name="TokenPayload"></a>
+
+## TokenPayload : <code>Object</code>
+**Kind**: global typedef  
+**Properties**
+
+| Name | Type | Description |
+| --- | --- | --- |
+| permissions | <code>Array.&lt;string&gt;</code> | the permissions granted to this token |
+| roles | <code>Array.&lt;string&gt;</code> | the permissions granted to this token |
+| sub | <code>string</code> | the subject (or identifier) for this token |
+| tenantId | <code>string</code> | the primary tenant for the token |
+| [tenantIds] | <code>Array.&lt;string&gt;</code> | the optional list of additional  allowed tenants for the token |
+| type | <code>string</code> | the type of the token |
+| exp | <code>number</code> | the timestamp at which the token will expire |
 
