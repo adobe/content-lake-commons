@@ -163,7 +163,12 @@ export class Security {
   async authorize(req) {
     this.#getRequiredHeader(req, 'x-space-id');
     const token = this.#getToken(req);
-    await this.#verifyToken(token);
+    try {
+      await this.#verifyToken(token);
+    } catch (err) {
+      this.#log.warn('Unable to verify token due to exception', err);
+      throw new RestError(401);
+    }
   }
 
   /**

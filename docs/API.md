@@ -81,18 +81,21 @@ Loads schemas from this project in the <code>schemas</code> directory and suppor
 objects against the schemas.
 
 **Kind**: global class  
-<a name="SchemaValidator+validateIngestionRequest"></a>
+<a name="SchemaValidator+validateObject"></a>
 
-### schemaValidator.validateIngestionRequest(ingestionRequest, additionalRequiredData)
-Validates the <code>ingestionRequest</code> object against the Ingestion Request schema
+### schemaValidator.validateObject(obj, schemaName, additionalRequiredData)
+Validates an object against the schema specified by <code>schemaName</code>
 as specified in https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract
+
+Throws <code>Error</code> if request does not match
 
 **Kind**: instance method of [<code>SchemaValidator</code>](#SchemaValidator)  
 **See**: https://wiki.corp.adobe.com/display/WEM/Ingestor+API+Contract?  
 
 | Param | Type |
 | --- | --- |
-| ingestionRequest | <code>any</code> | 
+| obj | <code>any</code> | 
+| schemaName | <code>string</code> | 
 | additionalRequiredData | <code>Array.&lt;string&gt;</code> | 
 
 <a name="extractAwsConfig"></a>
