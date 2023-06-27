@@ -172,7 +172,7 @@ describe('Cloud Search Index Storage tests', async () => {
     const saveResult = await searchIndexStorage.save(contentRecord);
     assert.notEqual(undefined, saveResult);
 
-    const objects = await searchIndexStorage.getObjectsBy('sourceType', contentRecord.sourceType);
+    const objects = await searchIndexStorage.getObjectsBy('sourceId', contentRecord.sourceId);
     assert.strictEqual(objects.length, 1);
     assert.deepStrictEqual(objects[0], saveResult);
   });
@@ -181,7 +181,7 @@ describe('Cloud Search Index Storage tests', async () => {
     const saveResult = await searchIndexStorage.save(contentRecord);
     assert.notEqual(undefined, saveResult);
 
-    const objects = await searchIndexStorage.getObjectIdsBy('sourceType', contentRecord.sourceType);
+    const objects = await searchIndexStorage.getObjectIdsBy('sourceId', contentRecord.sourceId);
     assert.strictEqual(objects.length, 1);
     assert.deepStrictEqual(objects[0], saveResult.objectID);
   });
