@@ -14,13 +14,15 @@ import path from 'path';
 import Mime from 'mime';
 
 /**
- * Get mime type from Ingestion Job: either from job.data.name or job.data.mimeType
+ * Get mime type from Ingestion Job: either from job.data.mimeType or job.data.name
  * @param {Object} job Ingestion Job object (TODO: should be its own class)
  * @returns mime type
  */
 export function getMimeType(job) {
   let mime;
-  if (job?.data?.name) {
+  if (job?.data?.mimeType) {
+    mime = job.data.mimeType;
+  } else if (job?.data?.name) {
     const ext = (path.extname(job.data.name).substring(1)).toLowerCase();
     if (ext === 'ai') {
       // special case since mime libraries set this to `application/postscript`
@@ -29,5 +31,5 @@ export function getMimeType(job) {
       mime = Mime.getType(ext);
     }
   }
-  return mime || job?.data?.mimeType || 'application/octet-stream';
+  return mime || 'application/octet-stream';
 }

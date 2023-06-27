@@ -33,7 +33,22 @@ describe('mimetype', () => {
     const mimeType = getMimeType(job);
     assert.strictEqual(mimeType, 'image/jpeg');
   });
-  it('will prefer mimetype via extension over directly passing it in', () => {
+  it('must be exactly job.data.mimeType', () => {
+    let job = {
+      data: {
+        mimetype: 'image/jpeg',
+      },
+    };
+    let mimeType = getMimeType(job);
+    assert.strictEqual(mimeType, 'application/octet-stream');
+
+    job = {
+      mimeType: 'image/jpeg',
+    };
+    mimeType = getMimeType(job);
+    assert.strictEqual(mimeType, 'application/octet-stream');
+  });
+  it('will prefer mimetype via directly passing it in over extension', () => {
     const job = {
       data: {
         mimeType: 'image/png',
@@ -41,7 +56,7 @@ describe('mimetype', () => {
       },
     };
     const mimeType = getMimeType(job);
-    assert.strictEqual(mimeType, 'image/jpeg');
+    assert.strictEqual(mimeType, 'image/png');
   });
   it('special mimetype for illustrator files', () => {
     const job = {
