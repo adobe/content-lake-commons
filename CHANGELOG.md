@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/adobe/content-lake-commons/compare/v1.7.0...v1.8.0) (2023-06-27)
+
+
+### Features
+
+* add central function for determining mimetype from ingestion job; algolia script to change mimetypes ([#34](https://github.com/adobe/content-lake-commons/issues/34)) ([5a95e32](https://github.com/adobe/content-lake-commons/commit/5a95e3268a1f4664d06b458a0e144eae06b38ddc))
+
 # [1.7.0](https://github.com/adobe/content-lake-commons/compare/v1.6.1...v1.7.0) (2023-05-25)
 
 
