@@ -156,17 +156,42 @@ export class CloudSearchIndexStorage {
    * @returns {Promise<Array<string>>} list of objectIDs
    */
   async getObjectIdsByContentHash(contentHash) {
+    return this.getObjectIdsBy('contentHash', contentHash);
+  }
+
+  /**
+   * Get a list of ObjectIDs that contain the key,value pair
+   * Ex: `getObjectIdsBy('sourceType', 's3')` will get all records with `sourceType` of `s3`
+   *
+   * @param {String} key attribute to get by.
+   * @param {String} value value of the attribute to get by.
+   */
+  async getObjectIdsBy(key, value) {
+    const hits = await this.getObjectsBy(key, value);
+    if (hits.length > 0) {
+      return hits.map((hit) => hit.objectID);
+    }
+    return [];
+  }
+  /**
+   * Get a list of ObjectIDs that contain the key,value pair
+   * Ex: `getObjectIdsBy('sourceType', 's3')` will get all records with `sourceType` of `s3`
+   *
+   * @param {String} key attribute to get by.
+   * @param {String} value value of the attribute to get by.
+   */
+  async getObjectsBy(key, value) {
     const searchResult = await this.#index.search(
       '',
       {
         distinct: false,
         facetFilters: [
-          `contentHash:${contentHash}`,
+          `${key}:${value}`,
         ],
       },
     );
     if (searchResult?.nbHits > 0) {
-      return searchResult?.hits.map((hit) => hit.objectID);
+      return searchResult?.hits;
     }
     return [];
   }
