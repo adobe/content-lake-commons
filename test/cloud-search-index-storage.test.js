@@ -167,6 +167,24 @@ describe('Cloud Search Index Storage tests', async () => {
     assert.ok(!hits[0].randomField);
   });
 
+  it('Get all objects by key value pair', async () => {
+    const contentRecord = generateContentRecord();
+    const saveResult = await searchIndexStorage.save(contentRecord);
+    assert.notEqual(undefined, saveResult);
+
+    const objects = await searchIndexStorage.getObjectsBy('sourceId', contentRecord.sourceId);
+    assert.strictEqual(objects.length, 1);
+    assert.deepStrictEqual(objects[0], saveResult);
+  });
+  it('Get all objectIDs by key value pair', async () => {
+    const contentRecord = generateContentRecord();
+    const saveResult = await searchIndexStorage.save(contentRecord);
+    assert.notEqual(undefined, saveResult);
+
+    const objects = await searchIndexStorage.getObjectIdsBy('sourceId', contentRecord.sourceId);
+    assert.strictEqual(objects.length, 1);
+    assert.deepStrictEqual(objects[0], saveResult.objectID);
+  });
   it('Get all objectIDs by contentHash', async () => {
     const contentRecord = generateContentRecord();
     const saveResult = await searchIndexStorage.save(contentRecord);

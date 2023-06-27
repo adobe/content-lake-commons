@@ -22,3 +22,4 @@ export * from './schema-validator.js';
 export * from './secret.js';
 export { CloudSearchIndexStorage } from './cloud-search-index-storage.js';
 export * as mocks from './mocks/index.js';
+export * from './mimetype.js';
