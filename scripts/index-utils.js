@@ -96,6 +96,7 @@ export function mergeEntries(entries) {
           newAcc[key] = entry[key];
         }
       } else if (Object.keys(AGGREGATED_FIELDS_MAP).includes(key)) {
+        // TODO: make aggregated fields a set to be unique
         newAcc[AGGREGATED_FIELDS_MAP[key]] = acc[AGGREGATED_FIELDS_MAP[key]]
           ? [...acc[AGGREGATED_FIELDS_MAP[key]], entry[key]] : [entry[key]];
       }
