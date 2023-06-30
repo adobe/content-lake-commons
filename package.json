@@ -33,6 +33,7 @@
     "@semantic-release/changelog": "6.0.3",
     "@semantic-release/git": "10.0.1",
     "@semantic-release/npm": "10.0.3",
+    "async": "^3.2.4",
     "c8": "7.13.0",
     "dotenv": "^16.0.3",
     "eslint": "8.41.0",

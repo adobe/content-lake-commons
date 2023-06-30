@@ -47,7 +47,7 @@ export class CloudSearchIndexStorage {
   ]);
   #INDEX_PREFIX = 'company';
   #log;
-  #index;
+  index;
   #indexName;
 
   constructor(context, companyId) {
@@ -55,7 +55,7 @@ export class CloudSearchIndexStorage {
     this.#log = new ContextHelper(context).getLog();
     this.#log.info('Using Search Index', this.#indexName);
 
-    this.#index = this.getClient(context).initIndex(this.#indexName);
+    this.index = this.getClient(context).initIndex(this.#indexName);
   }
 
   getIndexName() {
@@ -99,7 +99,7 @@ export class CloudSearchIndexStorage {
     const facetFilters = Object.keys(query).map(
       (key) => `${key}:${query[key]}`,
     );
-    const searchResult = await this.#index.search('', {
+    const searchResult = await this.index.search('', {
       facetFilters,
     });
     if (searchResult?.hits?.length === 0) {
@@ -114,7 +114,7 @@ export class CloudSearchIndexStorage {
    * @returns the raw result of the query; will contain the record if it exists.
    */
   async get(objectID) {
-    return this.#index.search(
+    return this.index.search(
       '',
       {
         facetFilters: [
@@ -146,8 +146,8 @@ export class CloudSearchIndexStorage {
       this.#log.warn(`Missing objectID, generating a new one: ${indexRecord.objectID}`);
     }
 
-    this.#log.info(`Saving doc to cloud record storage index ${this.#indexName}`, indexRecord);
-    return this.#index.saveObject(indexRecord);
+    this.#log.info(`Saving doc to cloud record storage index ${this.indexName}`, indexRecord);
+    return this.index.saveObject(indexRecord);
   }
 
   /**
@@ -180,11 +180,11 @@ export class CloudSearchIndexStorage {
    * @param {String} key attribute to get by.
    * @param {String} value value of the attribute to get by.
    */
-  async getObjectsBy(key, value) {
-    const searchResult = await this.#index.search(
+  async getObjectsBy(key, value, distinct = true) {
+    const searchResult = await this.index.search(
       '',
       {
-        distinct: false,
+        distinct,
         facetFilters: [
           `${key}:${value}`,
         ],
@@ -239,9 +239,9 @@ export class CloudSearchIndexStorage {
       }, {});
       return indexRecord;
     });
-    this.#log.info(`Updating docs ${indexRecords.length} records in cloud record storage index ${this.#indexName}`);
+    this.#log.info(`Updating docs ${indexRecords.length} records in cloud record storage index ${this.indexName}`);
     this.#log.debug('Documents updated:', indexRecords);
-    return this.#index.partialUpdateObjects(indexRecords);
+    return this.index.partialUpdateObjects(indexRecords);
   }
 
   /**
@@ -250,7 +250,7 @@ export class CloudSearchIndexStorage {
    * @returns {Promise<any>}
    */
   async delete(objectID) {
-    return this.#index.deleteObject(objectID);
+    return this.index.deleteObject(objectID);
   }
 
   /**
@@ -262,11 +262,11 @@ export class CloudSearchIndexStorage {
    * @param {String} key attribute to delete by.
    * @param {String} value value of the attribute to delete by.
    */
-  async deleteBy(key, value) {
+  async deleteBy(key, value, _options) {
     this.#log.info(`Deleting all records with '${key}' containing value ${value}`);
     const params = {
       filters: `${key}:${value}`,
     };
-    return this.#index.deleteBy(params);
+    return this.index.deleteBy(params, _options);
   }
 }
