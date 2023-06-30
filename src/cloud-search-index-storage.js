@@ -146,7 +146,7 @@ export class CloudSearchIndexStorage {
       this.#log.warn(`Missing objectID, generating a new one: ${indexRecord.objectID}`);
     }
 
-    this.#log.info(`Saving doc to cloud record storage index ${this.indexName}`, indexRecord);
+    this.#log.info(`Saving doc to cloud record storage index ${this.#indexName}`, indexRecord);
     return this.index.saveObject(indexRecord);
   }
 

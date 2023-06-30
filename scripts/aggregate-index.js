@@ -13,11 +13,12 @@
 /* eslint-disable no-console */
 // eslint-disable-next-line import/no-extraneous-dependencies
 import dotenv from 'dotenv';
+import crypto from 'crypto';
 import { CloudSearchIndexStorage } from '../src/cloud-search-index-storage.js';
 import { getAllAssetIdentities, mergeEntries } from './index-utils.js';
-import parallelLimit from 'async/parallelLimit';
+import { parallelLimit } from 'async';
 
-const NEW_INDEX = 'delbick-aggregated-index';
+const NEW_INDEX = 'delbick-test-aggregated';
 
 dotenv.config();
 
@@ -68,15 +69,19 @@ assetIdentities.forEach((assetIdentity) => {
   tasks.push(async () => {
     // if no object for that asset identity exists in new index, do work
     const objects = await newSearchIndex.getObjectsBy('assetIdentity', assetIdentity);
-    console.log(`Found ${objects.length} existing objects for assetIdentity:${assetIdentity} in the new index`);
+    console.log(`Found ${objects.length} existing objects for assetIdentity:${assetIdentity} in the new index: ${newSearchIndex.getIndexName()}`);
     if (objects.length === 0) {
       // get all objects for that asset identity (distinct:false)
+      console.log(`Getting all objects for assetIdentity:${assetIdentity} from the old index: ${oldSearchIndex.getIndexName()}`);
       const singleEntries = await oldSearchIndex.getObjectsBy('assetIdentity', assetIdentity, false);
       // form new aggregated entry
       // merge all objects into one
+      console.log(`Merging ${singleEntries.length} objects for assetIdentity:${assetIdentity}`);
       const newObject = mergeEntries(singleEntries);
+      newObject.objectID = crypto.randomUUID();
+      console.log('Adding new object to new index', newObject);
       // add entry to new index
-    //   await newSearchIndex.save(newObject);
+      await newSearchIndex.index.saveObject(newObject);
     }
   });
 });

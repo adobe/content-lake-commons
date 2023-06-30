@@ -18,20 +18,21 @@ const NON_AGGREGATED_FIELDS = [
   'companyId',
   'spaceId',
   'caption',
+  'tags',
   'width',
   'height',
   'date',
   'color',
   'assetStatus',
 ];
+// TODO: map field to updated name and merge strategy
+// contentHash: { name: 'contentHashes', merge: 'union' },
 const AGGREGATED_FIELDS_MAP = {
   contentHash: 'contentHashes',
   sourceName: 'sourceNames',
   sourceType: 'sourceTypes',
   thumbnailHash: 'thumbnailHashes',
   type: 'types',
-  tags: 'tags',
-  ocrTags: 'ocrTags',
   sourceAssetId: 'sourceAssetIds',
   sourcePath: 'sourcePaths',
   sourceMimeType: 'sourceMimeTypes',
@@ -45,6 +46,17 @@ const SOURCE_MIMETYPE_RANKINGS = {
   'image/vnd.adobe.photoshop': 3,
   'application/pdf': 3,
 };
+
+const STATUS_MAP = {
+  Unknown: 0,
+  'Work in Progress': 1,
+  'In Review': 2,
+  'Ready to Use': 3,
+  Published: 4,
+  Archived: 5,
+  Embargoed: 100,
+};
+
 // WARNING: Do not use this function if index is larger than ~4million records
 // since it is stored in an array
 export async function getAllAssetIdentities(index) {
@@ -94,6 +106,16 @@ export function mergeEntries(entries) {
       if (NON_AGGREGATED_FIELDS.includes(key)) {
         if (JSON.stringify(entry) === JSON.stringify(bestmatch)) {
           newAcc[key] = entry[key];
+        }
+        // special case for asset status
+        if (key === 'assetStatus') {
+          if (!acc[key]) {
+            newAcc[key] = entry[key];
+          } else if (STATUS_MAP[entry[key]] > STATUS_MAP[acc[key]]) {
+            newAcc[key] = entry[key];
+          } else {
+            newAcc[key] = acc[key];
+          }
         }
       } else if (Object.keys(AGGREGATED_FIELDS_MAP).includes(key)) {
         // TODO: make aggregated fields a set to be unique
