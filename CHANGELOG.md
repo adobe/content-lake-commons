@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/adobe/content-lake-commons/compare/v1.8.1...v1.8.2) (2023-07-05)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([870dba3](https://github.com/adobe/content-lake-commons/commit/870dba34dd50b63d44c0642d56f984f3c3ba0e10))
+
 ## [1.8.1](https://github.com/adobe/content-lake-commons/compare/v1.8.0...v1.8.1) (2023-06-28)
 
 
