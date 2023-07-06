@@ -14,6 +14,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import dotenv from 'dotenv';
 import crypto from 'crypto';
+import fs from 'fs/promises';
 import { CloudSearchIndexStorage } from '../src/cloud-search-index-storage.js';
 import { getAllAssetIdentities, mergeEntries } from './index-utils.js';
 import { parallelLimit } from 'async';
@@ -81,8 +82,14 @@ assetIdentities.forEach((assetIdentity) => {
       newObject.objectID = crypto.randomUUID();
       console.log('Adding new object to new index', newObject);
       // add entry to new index
-      await newSearchIndex.index.saveObject(newObject);
+      try {
+        await newSearchIndex.index.saveObject(newObject);
+      } catch (error) {
+        console.log('Error adding new object to new index', error);
+        // TODO: write object to a file to upload later
+        fs.writeFile(`./${newObject.objectID}.json`, JSON.stringify(newObject));
+      }
     }
   });
 });
-const results = await parallelLimit(tasks, 1000);
+const results = await parallelLimit(tasks, 100);

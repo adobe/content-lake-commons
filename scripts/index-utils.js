@@ -48,6 +48,7 @@ const SOURCE_MIMETYPE_RANKINGS = {
 };
 
 const STATUS_MAP = {
+  'work-in-progress': -1, // invalid and outdated status, force unknown
   Unknown: 0,
   'Work in Progress': 1,
   'In Review': 2,
@@ -101,7 +102,7 @@ export function mergeEntries(entries) {
   let bestmatch;
   return entries.reduce((acc, entry) => {
     bestmatch = getBestMatch(bestmatch, entry);
-    const newAcc = {};
+    const newAcc = acc;
     Object.keys(entry).forEach((key) => {
       if (NON_AGGREGATED_FIELDS.includes(key)) {
         if (JSON.stringify(entry) === JSON.stringify(bestmatch)) {
@@ -121,6 +122,9 @@ export function mergeEntries(entries) {
         // TODO: make aggregated fields a set to be unique
         newAcc[AGGREGATED_FIELDS_MAP[key]] = acc[AGGREGATED_FIELDS_MAP[key]]
           ? [...acc[AGGREGATED_FIELDS_MAP[key]], entry[key]] : [entry[key]];
+
+        // remove duplicates from newAcc of field
+        newAcc[AGGREGATED_FIELDS_MAP[key]] = [...new Set(newAcc[AGGREGATED_FIELDS_MAP[key]])];
       }
     });
     return newAcc;
