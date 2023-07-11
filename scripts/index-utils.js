@@ -15,10 +15,10 @@ const NON_AGGREGATED_FIELDS = [
   'objectID',
   'assetIdentity',
   'file',
-  'companyId',
   'spaceId',
   'caption',
   'tags',
+  'ocrTags',
   'width',
   'height',
   'date',
@@ -28,14 +28,13 @@ const NON_AGGREGATED_FIELDS = [
 // TODO: map field to updated name and merge strategy
 // contentHash: { name: 'contentHashes', merge: 'union' },
 const AGGREGATED_FIELDS_MAP = {
-  contentHash: 'contentHashes',
   sourceName: 'sourceNames',
   sourceType: 'sourceTypes',
   thumbnailHash: 'thumbnailHashes',
   type: 'types',
   sourceAssetId: 'sourceAssetIds',
-  sourcePath: 'sourcePaths',
   sourceMimeType: 'sourceMimeTypes',
+  sourceId: 'sourceIds',
 };
 
 // map sourcemimetype to a number, higher number is better

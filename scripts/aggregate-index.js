@@ -61,6 +61,7 @@ const newSearchIndex = new CloudSearchIndexStorage(newContext);
 // 1. get list of all asset identities from old index
 const start = Date.now();
 const assetIdentities = await getAllAssetIdentities(oldSearchIndex.index);
+// warning, if asset identities length is larger than max array size, could cause memory issues
 console.log('length of assetIdentities', assetIdentities.size);
 console.log(`Browsed index in ${Date.now() - start}ms`);
 // 2. loop through each asset identity
@@ -80,9 +81,10 @@ assetIdentities.forEach((assetIdentity) => {
       console.log(`Merging ${singleEntries.length} objects for assetIdentity:${assetIdentity}`);
       const newObject = mergeEntries(singleEntries);
       newObject.objectID = crypto.randomUUID();
-      console.log('Adding new object to new index', newObject);
+      // console.log('Adding new object to new index', newObject);
       // add entry to new index
       try {
+        // TODO: upload in batches
         await newSearchIndex.index.saveObject(newObject);
       } catch (error) {
         console.log('Error adding new object to new index', error);
@@ -92,5 +94,5 @@ assetIdentities.forEach((assetIdentity) => {
     }
   });
 });
-await parallelLimit(tasks, 100);
+await parallelLimit(tasks, 200);
 console.log(`Created new aggregated index in ${Date.now() - start}ms`);
