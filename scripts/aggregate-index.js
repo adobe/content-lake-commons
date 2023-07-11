@@ -19,7 +19,7 @@ import { CloudSearchIndexStorage } from '../src/cloud-search-index-storage.js';
 import { getAllAssetIdentities, mergeEntries } from './index-utils.js';
 import { parallelLimit } from 'async';
 
-const NEW_INDEX = 'delbick-test-aggregated';
+const NEW_INDEX = 'delbick-test-aggregated'; // always use a test index to avoid overwriting existing data
 
 dotenv.config();
 
@@ -92,4 +92,5 @@ assetIdentities.forEach((assetIdentity) => {
     }
   });
 });
-const results = await parallelLimit(tasks, 100);
+await parallelLimit(tasks, 100);
+console.log(`Created new aggregated index in ${Date.now() - start}ms`);
