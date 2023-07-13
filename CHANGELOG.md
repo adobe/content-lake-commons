@@ -1,3 +1,10 @@
+## [1.8.4](https://github.com/adobe/content-lake-commons/compare/v1.8.3...v1.8.4) (2023-07-13)
+
+
+### Bug Fixes
+
+* changes needed to run aggregated index script ([#37](https://github.com/adobe/content-lake-commons/issues/37)) ([b760792](https://github.com/adobe/content-lake-commons/commit/b760792b7911af880f852f826333d5f10070416e))
+
 ## [1.8.3](https://github.com/adobe/content-lake-commons/compare/v1.8.2...v1.8.3) (2023-07-08)
 
 
