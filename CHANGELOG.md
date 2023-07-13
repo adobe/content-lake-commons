@@ -1,3 +1,24 @@
+## [1.8.3](https://github.com/adobe/content-lake-commons/compare/v1.8.2...v1.8.3) (2023-07-08)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes to v3.367.0 ([d7101f1](https://github.com/adobe/content-lake-commons/commit/d7101f17c875b23b9a40e7a5ef7e1dca45ad9a36))
+
+## [1.8.2](https://github.com/adobe/content-lake-commons/compare/v1.8.1...v1.8.2) (2023-07-05)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([870dba3](https://github.com/adobe/content-lake-commons/commit/870dba34dd50b63d44c0642d56f984f3c3ba0e10))
+
+## [1.8.1](https://github.com/adobe/content-lake-commons/compare/v1.8.0...v1.8.1) (2023-06-28)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([5ca545b](https://github.com/adobe/content-lake-commons/commit/5ca545bc57bd8c5a747c309f124d780bf0472324))
+
 # [1.8.0](https://github.com/adobe/content-lake-commons/compare/v1.7.0...v1.8.0) (2023-06-27)
 
 
