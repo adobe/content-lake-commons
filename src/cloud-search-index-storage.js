@@ -261,6 +261,7 @@ export class CloudSearchIndexStorage {
    *
    * @param {String} key attribute to delete by.
    * @param {String} value value of the attribute to delete by.
+   * @param {Object} _options request options to pass to the deleteBy method
    */
   async deleteBy(key, value, _options) {
     this.#log.info(`Deleting all records with '${key}' containing value ${value}`);
