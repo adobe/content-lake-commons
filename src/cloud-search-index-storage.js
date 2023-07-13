@@ -179,6 +179,7 @@ export class CloudSearchIndexStorage {
    *
    * @param {String} key attribute to get by.
    * @param {String} value value of the attribute to get by.
+   * @param {Boolean} distinct whether to return distinct values or not
    */
   async getObjectsBy(key, value, distinct = true) {
     const searchResult = await this.index.search(
@@ -261,13 +262,13 @@ export class CloudSearchIndexStorage {
    *
    * @param {String} key attribute to delete by.
    * @param {String} value value of the attribute to delete by.
-   * @param {Object} _options request options to pass to the deleteBy method
+   * @param {Object} options request options to pass to the deleteBy method
    */
-  async deleteBy(key, value, _options) {
+  async deleteBy(key, value, options) {
     this.#log.info(`Deleting all records with '${key}' containing value ${value}`);
     const params = {
       filters: `${key}:${value}`,
     };
-    return this.index.deleteBy(params, _options);
+    return this.index.deleteBy(params, options);
   }
 }
