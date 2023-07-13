@@ -15,19 +15,25 @@
 import dotenv from 'dotenv';
 import crypto from 'crypto';
 import fs from 'fs/promises';
+import { parallelLimit } from 'async';
 import { CloudSearchIndexStorage } from '../src/cloud-search-index-storage.js';
 import { getAllAssetIdentities, mergeEntries } from './index-utils.js';
-import { parallelLimit } from 'async';
-
-const NEW_INDEX = 'delbick-test-aggregated'; // always use a test index to avoid overwriting existing data
 
 dotenv.config();
+
+if (!process.env.ALGOLIA_APP_NAME
+  || !process.env.ALGOLIA_API_KEY
+  || !process.env.ALGOLIA_SINGLE_ENTRY_INDEX
+  || !process.env.ALGOLIA_AGGREGATED_INDEX) {
+  console.log('Missing required environment variables');
+  process.exit(1);
+}
 
 const context = {
   env: {
     ALGOLIA_APP_NAME: process.env.ALGOLIA_APP_NAME,
     ALGOLIA_API_KEY: process.env.ALGOLIA_API_KEY,
-    ALGOLIA_CI_INDEX: process.env.ALGOLIA_CI_INDEX,
+    ALGOLIA_CI_INDEX: process.env.ALGOLIA_SINGLE_ENTRY_INDEX,
   },
   log: console,
 };
@@ -35,7 +41,7 @@ const newContext = {
   env: {
     ALGOLIA_APP_NAME: process.env.ALGOLIA_APP_NAME,
     ALGOLIA_API_KEY: process.env.ALGOLIA_API_KEY,
-    ALGOLIA_CI_INDEX: NEW_INDEX,
+    ALGOLIA_CI_INDEX: process.env.ALGOLIA_AGGREGATED_INDEX,
   },
   log: console,
 };
@@ -87,7 +93,7 @@ assetIdentities.forEach((assetIdentity) => {
         // TODO: upload in batches
         await newSearchIndex.index.saveObject(newObject);
       } catch (error) {
-        console.log('Error adding new object to new index', error);
+        console.log(`Error adding new object to new index for assetIdentity: ${assetIdentity}`, error);
         // TODO: write object to a file to upload later
         fs.writeFile(`./${newObject.objectID}.json`, JSON.stringify(newObject));
       }
