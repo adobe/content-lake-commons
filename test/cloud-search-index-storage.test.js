@@ -94,7 +94,7 @@ describe('Cloud Search Index Storage tests', async () => {
       log: console,
     };
     const searchIndexStorage2 = new CloudSearchIndexStorage(context, 'test-company-id');
-    assert.strictEqual(searchIndexStorage2.getIndexName(), 'company-test-company-id');
+    assert.strictEqual(searchIndexStorage2.getIndexName(), 'company-details-test-company-id');
   });
 
   it('check if item exists requires a contentHash', async () => {
