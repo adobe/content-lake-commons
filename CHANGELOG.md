@@ -1,3 +1,10 @@
+# [1.9.0](https://github.com/adobe/content-lake-commons/compare/v1.8.5...v1.9.0) (2023-07-17)
+
+
+### Features
+
+* change prefix for single entry index to ([#40](https://github.com/adobe/content-lake-commons/issues/40)) ([bd006a5](https://github.com/adobe/content-lake-commons/commit/bd006a59ec55c896268477c87ab28e888b6da0a0))
+
 ## [1.8.5](https://github.com/adobe/content-lake-commons/compare/v1.8.4...v1.8.5) (2023-07-16)
 
 
