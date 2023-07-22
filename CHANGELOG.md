@@ -1,3 +1,10 @@
+## [1.9.1](https://github.com/adobe/content-lake-commons/compare/v1.9.0...v1.9.1) (2023-07-22)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([e3d8319](https://github.com/adobe/content-lake-commons/commit/e3d831944e75f42191d239844566ab7249a79183))
+
 # [1.9.0](https://github.com/adobe/content-lake-commons/compare/v1.8.5...v1.9.0) (2023-07-17)
 
 
