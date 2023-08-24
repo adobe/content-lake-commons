@@ -85,6 +85,15 @@ describe('mimetype', () => {
     const mimeType = getMimeType(job);
     assert.strictEqual(mimeType, 'application/pdf');
   });
+  it('gets mimetype for SVG images', () => {
+    const job = {
+      data: {
+        name: 'file.svg',
+      },
+    };
+    const mimeType = getMimeType(job);
+    assert.strictEqual(mimeType, 'image/svg+xml');
+  });
   it('default to `application/octet-stream` if no valid extension', () => {
     const job = {
       data: {
