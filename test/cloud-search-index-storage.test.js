@@ -56,6 +56,8 @@ function generateContentRecord() {
     color: 'silver',
     sourceUrl: 'https://my.aemassets.net/content/dam/pickle.png',
     randomField: 'randomValue',
+    pageUrls: ['https://www.adobe.com/image1.jpg', 'https://www.adobe.com/image2.jpg'],
+    impressions: 20,
   };
 }
 
@@ -135,6 +137,8 @@ describe('Cloud Search Index Storage tests', async () => {
     assert.strictEqual(exists[0].caption, contentRecord.caption);
     assert.strictEqual(exists[0].color, contentRecord.color);
     assert.strictEqual(exists[0].sourceUrl, contentRecord.sourceUrl);
+    assert.deepStrictEqual(exists[0].pageUrls, contentRecord.pageUrls);
+    assert.strictEqual(exists[0].impressions, contentRecord.impressions);
     assert.ok(exists[0].objectID);
     assert.ok(!exists[0].randomField);
   });
