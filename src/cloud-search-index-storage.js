@@ -44,6 +44,8 @@ export class CloudSearchIndexStorage {
     'sourceSize',
     'sourceWidth',
     'sourceHeight',
+    'pageUrls',
+    'impressions',
   ]);
   #INDEX_PREFIX = 'company-details';
   #log;
