@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/adobe/content-lake-commons/compare/v1.9.7...v1.10.0) (2023-08-31)
+
+
+### Features
+
+* Add pageUrls and impressions metadata fields to index ([#50](https://github.com/adobe/content-lake-commons/issues/50)) ([7615b6f](https://github.com/adobe/content-lake-commons/commit/7615b6f85e043df31374cba015368be86a1e689d))
+
 ## [1.9.7](https://github.com/adobe/content-lake-commons/compare/v1.9.6...v1.9.7) (2023-08-26)
 
 
