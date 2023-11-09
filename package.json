@@ -35,7 +35,7 @@
     "@semantic-release/npm": "10.0.6",
     "c8": "7.14.0",
     "dotenv": "^16.0.3",
-    "eslint": "8.52.0",
+    "eslint": "8.53.0",
     "husky": "8.0.3",
     "jsdoc-plugin-intersection": "^1.0.4",
     "jsdoc-to-markdown": "8.0.0",
