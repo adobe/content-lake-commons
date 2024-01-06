@@ -1,6 +1,6 @@
 {
   "name": "@adobe/content-lake-commons",
-  "version": "1.10.17",
+  "version": "1.10.18",
   "description": "Content Lake - Commons",
   "main": "src/index.js",
   "type": "module",
