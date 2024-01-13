@@ -1,3 +1,10 @@
+## [1.10.19](https://github.com/adobe/content-lake-commons/compare/v1.10.18...v1.10.19) (2024-01-13)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([a0703fe](https://github.com/adobe/content-lake-commons/commit/a0703fea23b3e46106674e0aa330c27045e47bec))
+
 ## [1.10.18](https://github.com/adobe/content-lake-commons/compare/v1.10.17...v1.10.18) (2024-01-06)
 
 
