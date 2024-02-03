@@ -1,3 +1,10 @@
+## [1.10.22](https://github.com/adobe/content-lake-commons/compare/v1.10.21...v1.10.22) (2024-02-03)
+
+
+### Bug Fixes
+
+* **deps:** update external fixes ([077a829](https://github.com/adobe/content-lake-commons/commit/077a8291734ce1570c92ce6ad33195062896caae))
+
 ## [1.10.21](https://github.com/adobe/content-lake-commons/compare/v1.10.20...v1.10.21) (2024-01-27)
 
 
